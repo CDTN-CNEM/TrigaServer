@@ -1,57 +1,45 @@
-#include "TrigaModbus.hpp"
+#include "libModbusSystematomSPU.h"
+//#inclUde "libModbusSiemensCLP.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <chrono>
 #include <ctime>
 
-std::string getCurrentDateTime() {
+std::string logTime() {
     auto now = std::chrono::system_clock::now();
     auto in_time_t = std::chrono::system_clock::to_time_t(now);
-
     std::stringstream ss;
-    ss << "TrigaLog-" << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d-%H-%M-%S") << ".log";
-
+    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d-%H-%M-%S");
     return ss.str();
 }
 
 int main() {
-    TrigaModbus plc("127.0.0.1", 502);
+    //libModbusSiemensCLP CLP(); //CLP Siemens
+    libModbusSystematomSPU SPUch[2] = {
+        "/dev/ttyF0", // SPU channel A
+        "/dev/ttyF1"  // SPU channel B
+    };
 
-    if (!plc.connect()) {
-        std::cerr << "Não foi possível conectar ao PLC";
-        return -1;
-    }
+    std::string filename = "TrigaLog-" + logTime() + ".log";;
+    std::ofstream logfile(filename, std::ios::app);
 
-    int regAddr = 0;
-    int numRegs = 10;
-    uint16_t* regsBuffer = new uint16_t[numRegs];
-
-    if (plc.readRegisters(regAddr, numRegs, regsBuffer)) {
-        std::cout << "Valores lidos dos registradores:" << std::endl;
-        for (int i = 0; i < numRegs; i++) {
-            std::cout << "Registrador " << regAddr + i << ": " << regsBuffer[i] << std::endl;
+    if (logfile.is_open()) {
+        int num_leituras = 10; 
+        for (int i = 0; i < num_leituras; i++) {
+            SPUch[0].readAllRegisters(100);
+            logfile << logTime() << "\t Canal A \t N = " << SPUch[0].get_N_DATA_FP() << "\t T = " << SPUch[0].get_T_DATA_FP();// << std::endl;
+            SPUch[1].readAllRegisters(100);
+            logfile /*<< logTime()*/ << "\t Canal B \t N = " << SPUch[1].get_N_DATA_FP() << "\t T = " << SPUch[1].get_T_DATA_FP() << std::endl;
         }
+        logfile << "---------------------------" << std::endl;
 
-        std::string filename = getCurrentDateTime();
-        std::ofstream logfile(filename, std::ios::app);
+        logfile.close();
 
-        if (logfile.is_open()) {
-            logfile << "Valores lidos dos registradores:" << std::endl;
-            for (int i = 0; i < numRegs; i++) {
-                logfile << "Registrador " << regAddr + i << ": " << regsBuffer[i] << std::endl;
-            }
-
-            logfile << "---------------------------" << std::endl;
-
-            logfile.close();
-            std::cout << "Valores escritos no arquivo de log: " << filename << std::endl;
-        } else {
-            std::cerr << "Não foi possível abrir o arquivo de log para escrita." << std::endl;
-        }
+        std::cout << "Valores escritos no arquivo de log: " << filename << std::endl;
+    } else {
+        std::cerr << "Não foi possível abrir o arquivo de log para escrita." << std::endl;
     }
-
-    delete[] regsBuffer;
 
     return 0;
 }
