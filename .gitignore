@@ -1,3 +1,10 @@
+# Project
+.vscode/
+*/.vscode/
+*/lib*
+*/build/
+TrigaServer
+
 # Prerequisites
 *.d
 
