@@ -227,6 +227,7 @@ class TrigaServer
 
 int main()
 {
+    system("clear");
     TrigaServer server;
     server.showLicense();
     server.startServer();

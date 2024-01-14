@@ -8,7 +8,9 @@ This library comes with ABSOLUTELY NO WARRANTY; Is under GNU GENERAL PUBLIC LICE
 For more details read the file LICENSE.
 Copyright (C) 2023-2024  Thalles Campagnani
 
-## Compiling the first time
+## Compiling
+
+### Compiling the first time
 
 First clone the repository:
 
@@ -22,18 +24,33 @@ Give permission to execute the script ```compile.sh```.
 chmod +x compile.sh
 ```
 
-Execute the script ```compile.sh``` using the parameter clean:
+Execute the script ```compile.sh``` using the parameter reset:
 
 ``` Bash
-./compile.sh clean
+./compile.sh reset
 ```
 
-## Compiling modifications
+### Compiling modifications
 
-After modify the code you can just run the script ```compile.sh``` doing:
+After modify the code to compile you can just run the script ```compile.sh``` doing:
 
 ``` Bash
 ./compile.sh
 ```
 
-If you use the parameter clean, will clean the modification of the librarys.
+You also can use the folowing parameters:
+
+- reset: remove modifications of librery and clone they again.
+- run: after compile, run the binary.
+- install: put the binary in /usr/bin/
+- installservice: put the binary in /usr/bin/ and enable and start the service in systemd.
+
+Exemple of usage of parameters (chose one):
+``` Bash
+./compile.sh run
+./compile.sh install
+./compile.sh installservice
+./compile.sh reset run
+./compile.sh reset install
+./compile.sh reset installservice
+```
