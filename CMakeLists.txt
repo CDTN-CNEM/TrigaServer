@@ -57,7 +57,7 @@ target_compile_options(
                       ${SERIALPORT_CFLAGS_OTHER} ${JSONCPP_CFLAGS_OTHER})
 
 install(TARGETS trigaserver)
-install(FILES ${PROJECT_SOURCE_DIR}/resources/TrigaServer.conf
+install(FILES ${PROJECT_SOURCE_DIR}/resources/trigaserver.conf
         DESTINATION /etc/)
 
 if(SYSTEMD_FOUND AND "${SYSTEMD_SERVICES_INSTALL_DIR}" STREQUAL "")
@@ -66,14 +66,14 @@ if(SYSTEMD_FOUND AND "${SYSTEMD_SERVICES_INSTALL_DIR}" STREQUAL "")
     OUTPUT_VARIABLE SYSTEMD_SERVICES_INSTALL_DIR)
   string(REGEX REPLACE "[ \t\n]+" "" SYSTEMD_SERVICES_INSTALL_DIR
                        "${SYSTEMD_SERVICES_INSTALL_DIR}")
-  configure_file(${PROJECT_SOURCE_DIR}/resources/triga-server.service
-                 ${CMAKE_BINARY_DIR}/triga-server.service)
-  configure_file(${PROJECT_SOURCE_DIR}/resources/TrigaServer.conf
-                 ${CMAKE_BINARY_DIR}/TrigaServer.conf)
+  configure_file(${PROJECT_SOURCE_DIR}/resources/trigaserver.service
+                 ${CMAKE_BINARY_DIR}/trigaserver.service)
+  configure_file(${PROJECT_SOURCE_DIR}/resources/trigaserver.conf
+                 ${CMAKE_BINARY_DIR}/trigaserver.conf)
                  
-  install(FILES ${CMAKE_BINARY_DIR}/triga-server.service
+  install(FILES ${CMAKE_BINARY_DIR}/trigaserver.service
           DESTINATION ${SYSTEMD_SERVICES_INSTALL_DIR})
-  install(FILES ${CMAKE_BINARY_DIR}/TrigaServer.conf
+  install(FILES ${CMAKE_BINARY_DIR}/trigaserver.conf
           DESTINATION /etc/)
   
 endif()
