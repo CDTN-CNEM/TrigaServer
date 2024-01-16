@@ -21,8 +21,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define TRIGA_SERVER
 
 #include "estrutura.hpp"
-#include "libModbusSystematomSPU.hpp"
-#include "libModbusMaestecPLC.hpp"
+
+#include <libModbusSystematomSPU.hpp>
+#include <libModbusMaestecPLC.hpp>
 
 #include <iostream>
 #include <thread>

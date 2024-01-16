@@ -1,0 +1,11 @@
+[Unit]
+Description=TrigaServer
+After=network.target
+
+[Service]
+ExecStart=${CMAKE_INSTALL_BIN}/bin/TrigaServer
+Restart=always
+User=trigaserver
+
+[Install]
+WantedBy=multi-user.target
