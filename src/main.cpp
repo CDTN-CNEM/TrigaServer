@@ -76,7 +76,6 @@ void readConfigFile(const std::string& filename, const char*& spu_sp1, const cha
 
 int main(int argc, char* argv[])
 {
-    system("clear");
     cxxopts::Options options("TrigaServer","TrigaServer is a software for GNU operating system to get the real-time values of the Nuclear Reator Triga IPR-R1 and share in network.");
 
     options.add_options()
