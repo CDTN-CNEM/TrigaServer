@@ -1,11 +1,24 @@
-cmake_minimum_required(VERSION 3.10)
-project(TrigaServer)
+# Defina os arquivos fonte para a biblioteca ou executável
+set(SOURCE_FILES
+    estrutura.hpp
+    libModbusMaestecPLC.cpp
+    libModbusMaestecPLC.hpp
+    libModbusSystematomSPU.cpp
+    libModbusSystematomSPU.hpp
+    main.cpp
+    TrigaServer.cpp
+    TrigaServer.hpp
+)
 
-set(CMAKE_CXX_STANDARD 23)
+# Crie a biblioteca ou executável
+add_executable(TrigaServer ${SOURCE_FILES})
 
-add_executable(TrigaServer main.cpp)
+# Inclua os headers diretamente
+#target_include_directories(TrigaServer PRIVATE ../vendor/libModbusMaestecPLC ../vendor/libModbusSystematomSPU)
 
-add_library(libModbusMaestecPLC STATIC libModbusMaestecPLC.cpp libModbusMaestecPLC.hpp)
-add_library(libModbusSystematomSPU STATIC libModbusSystematomSPU.cpp libModbusSystematomSPU.hpp)
+# Inclua os arquivos diretamente
+#target_sources(TrigaServer PRIVATE ../vendor/libModbusMaestecPLC/libModbusMaestecPLC.cpp
+#                                   ../vendor/libModbusSystematomSPU/libModbusSystematomSPU.cpp)
 
-target_link_libraries(TrigaServer libModbusMaestecPLC libModbusSystematomSPU serialport modbus)
+target_link_libraries(TrigaServer PRIVATE -lmodbus -lserialport -ljsoncpp)
+

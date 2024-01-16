@@ -1,0 +1,11 @@
+[Unit]
+Description=TrigaServer
+After=network.target
+
+[Service]
+ExecStart=/bin/TrigaServer
+Restart=always
+User=TrigaServer
+
+[Install]
+WantedBy=multi-user.target

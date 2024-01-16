@@ -2,55 +2,24 @@
 
 TrigaServer is a software for GNU operating system to get the real-time values of the Nuclear Reator Triga IPR-R1 and share in network.
 
+## Compiling
+
+``` Bash
+git clone https://github.com/CDTNuclear/TrigaServer.git
+cd vendor
+chmod +x clone.sh
+./clone.sh
+cd ..
+mkdir -p build
+cd build
+cmake ..
+make
+cp src/TrigaServer ./
+cp ../resources/TrigaServer.conf ./
+```
+
 ## License, Warranty and Copyright
 
 This library comes with ABSOLUTELY NO WARRANTY; Is under GNU GENERAL PUBLIC LICENSE version 3 (GPL3), that means you ONLY can use in free software projects.
 For more details read the file LICENSE.
 Copyright (C) 2023-2024  Thalles Campagnani
-
-## Compiling
-
-### Compiling the first time
-
-First clone the repository:
-
-``` Bash
-git clone https://github.com/CDTNuclear/TrigaServer.git
-```
-
-Give permission to execute the script ```compile.sh```.
-
-``` Bash
-chmod +x compile.sh
-```
-
-Execute the script ```compile.sh``` using the parameter reset:
-
-``` Bash
-./compile.sh reset
-```
-
-### Compiling modifications
-
-After modify the code to compile you can just run the script ```compile.sh``` doing:
-
-``` Bash
-./compile.sh
-```
-
-You also can use the folowing parameters:
-
-- reset: remove modifications of librery and clone they again.
-- run: after compile, run the binary.
-- install: put the binary in /usr/bin/
-- installservice: put the binary in /usr/bin/ and enable and start the service in systemd.
-
-Exemple of usage of parameters (chose one):
-``` Bash
-./compile.sh run
-./compile.sh install
-./compile.sh installservice
-./compile.sh reset run
-./compile.sh reset install
-./compile.sh reset installservice
-```
