@@ -20,12 +20,12 @@ pkg_search_module(jsoncpp REQUIRED IMPORTED_TARGET jsoncpp)
 FetchContent_Declare(
   libModbusSystematomSPU
   GIT_REPOSITORY https://github.com/CDTNuclear/libModbusSystematomSPU
-  GIT_TAG 673a638f5f19ced2ba7d3a71895edc17225cde48)
+  GIT_TAG main)
 
 FetchContent_Declare(
   libModbusMaestecPLC
   GIT_REPOSITORY https://github.com/CDTNuclear/libModbusMaestecPLC
-  GIT_TAG 51d18e459b6caeed108caa61c1885c727a91724c)
+  GIT_TAG main)
 
 FetchContent_MakeAvailable(libModbusSystematomSPU libModbusMaestecPLC)
 
