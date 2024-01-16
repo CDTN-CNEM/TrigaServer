@@ -20,10 +20,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #ifndef TRIGA_SERVER
 #define TRIGA_SERVER
 
-#include "estrutura.hpp"
+#include "estrutura.h"
 
-#include <libModbusSystematomSPU.hpp>
-#include <libModbusMaestecPLC.hpp>
+#include <libModbusSystematomSPU.h>
+#include <libModbusMaestecPLC.h>
 
 #include <iostream>
 #include <thread>

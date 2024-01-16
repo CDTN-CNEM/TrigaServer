@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "TrigaServer.hpp"
+#include "TrigaServer.h"
 
 TrigaServer::TrigaServer(const char* spu_sp1,//SPU_CH_A serial port
                          const char* spu_sp2,//SPU_CH_B serial port
