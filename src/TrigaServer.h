@@ -38,7 +38,12 @@ using boost::asio::ip::tcp;
 class TrigaServer
 {
     public:
-        TrigaServer(const char* spu_sp1, const char* spu_sp2, const char* clp_ip, u_int16_t clp_port, boost::asio::io_service& io_service, short port);
+        TrigaServer(std::string spu_sp1, 
+                    std::string spu_sp2, 
+                    std::string clp_ip, 
+                    u_int16_t clp_port, 
+                    boost::asio::io_service& io_service, 
+                    short port);
         
     private:
         //

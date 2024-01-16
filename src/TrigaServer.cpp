@@ -19,9 +19,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "TrigaServer.h"
 
-TrigaServer::TrigaServer(const char* spu_sp1,//SPU_CH_A serial port
-                         const char* spu_sp2,//SPU_CH_B serial port
-                         const char* clp_ip, //CLP IP
+TrigaServer::TrigaServer(std::string spu_sp1,//SPU_CH_A serial port
+                         std::string spu_sp2,//SPU_CH_B serial port
+                         std::string clp_ip, //CLP IP
                          u_int16_t clp_port, //CPL Port
                          boost::asio::io_service& io_service, //Service of server
                          short port) //Port of server
