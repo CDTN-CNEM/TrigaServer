@@ -68,6 +68,12 @@ if(SYSTEMD_FOUND AND "${SYSTEMD_SERVICES_INSTALL_DIR}" STREQUAL "")
                        "${SYSTEMD_SERVICES_INSTALL_DIR}")
   configure_file(${PROJECT_SOURCE_DIR}/resources/triga-server.service
                  ${CMAKE_BINARY_DIR}/triga-server.service)
+  configure_file(${PROJECT_SOURCE_DIR}/resources/TrigaServer.conf
+                 ${CMAKE_BINARY_DIR}/TrigaServer.conf)
+                 
   install(FILES ${CMAKE_BINARY_DIR}/triga-server.service
           DESTINATION ${SYSTEMD_SERVICES_INSTALL_DIR})
+  install(FILES ${CMAKE_BINARY_DIR}/TrigaServer.conf
+          DESTINATION /etc/)
+  
 endif()

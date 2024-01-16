@@ -2,20 +2,14 @@
 
 TrigaServer is a software for GNU operating system to get the real-time values of the Nuclear Reator Triga IPR-R1 and share in network.
 
-## Compiling
+## Clone and compiling
 
 ``` Bash
 git clone https://github.com/CDTNuclear/TrigaServer.git
-cd vendor
-chmod +x clone.sh
-./clone.sh
-cd ..
 mkdir -p build
 cd build
 cmake ..
 make
-cp src/TrigaServer ./
-cp ../resources/TrigaServer.conf ./
 ```
 
 ## License, Warranty and Copyright
