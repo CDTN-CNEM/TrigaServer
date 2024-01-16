@@ -43,6 +43,18 @@ void TrigaServer::startThreads() // Método para Threads
     std::thread spuChAThread(&TrigaServer::readModbusRTU, this, std::ref(spuChA));
     std::thread spuChBThread(&TrigaServer::readModbusRTU, this, std::ref(spuChB));
     std::thread plcThread   (&TrigaServer::readModbusTCP, this, std::ref(plc));
+    #ifdef TestMax
+        std::thread serverThread0   (&TrigaServer::handleTCPClients, this);
+        std::thread serverThread1   (&TrigaServer::handleTCPClients, this);
+        std::thread serverThread2   (&TrigaServer::handleTCPClients, this);
+        std::thread serverThread3   (&TrigaServer::handleTCPClients, this);
+        std::thread serverThread4   (&TrigaServer::handleTCPClients, this);
+        std::thread serverThread5   (&TrigaServer::handleTCPClients, this);
+        std::thread serverThread6   (&TrigaServer::handleTCPClients, this);
+        std::thread serverThread7   (&TrigaServer::handleTCPClients, this);
+        std::thread serverThread8   (&TrigaServer::handleTCPClients, this);
+        std::thread serverThread9   (&TrigaServer::handleTCPClients, this);
+    #endif
 
     //Esperar todas as threads terminarem (idelmente não deveria terminar)
     spuChAThread.join();
@@ -125,25 +137,11 @@ void TrigaServer::handleTCPClients()
         auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
         auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
 
-        #ifdef MuTeX
-        {
-            std::lock_guard<std::mutex> lock(spuChAMutex);
-            data_local_spuChA = data_global_spuChA.load();
-        }
-        {
-            std::lock_guard<std::mutex> lock(spuChBMutex);
-            data_local_spuChB = data_global_spuChB.load();
-        }
-        {
-            std::lock_guard<std::mutex> lock(plcMutex);
-            data_local_plc = data_global_plc.load();
-        }
-        #else
-            data_local_spuChA = data_global_spuChA.load();
-            data_local_spuChB = data_global_spuChB.load();
-            data_local_plc = data_global_plc.load();
-        #endif
+        data_local_spuChA = data_global_spuChA.load();
+        data_local_spuChB = data_global_spuChB.load();
+        data_local_plc = data_global_plc.load();
 
+        #ifndef TestMax
         try {
             // Leitura da taxa do cliente
             float rate;
@@ -158,6 +156,7 @@ void TrigaServer::handleTCPClients()
         } catch (const std::exception& e) {
             std::cerr << "Erro na comunicação com o cliente: " << e.what() << std::endl;
         }
+        #endif
     }
 }
 
@@ -198,28 +197,8 @@ void TrigaServer::readModbusRTU(libModbusSystematomSPU& spu)
         }
 
         //Passar para o ponteiro inteligente global
-        if (spu.get_portname() == "/dev/ttyF0") 
-        {
-            #ifdef MuTeX
-            {
-                std::lock_guard<std::mutex> lock(spuChAMutex);
-                data_global_spuChA.store(data_local);
-            }
-            #else
-                data_global_spuChA.store(data_local);
-            #endif
-        }
-        else
-        {
-            #ifdef MuTeX
-            {
-                std::lock_guard<std::mutex> lock(spuChBMutex);
-                data_global_spuChB.store(data_local);
-            }
-            #else
-                data_global_spuChB.store(data_local);
-            #endif
-        }
+        if (spu.get_portname() == "/dev/ttyF0") data_global_spuChA.store(data_local);
+        else                                    data_global_spuChB.store(data_local);
     }
 }
 // Ler dados Modbus do PLC usando libModbusSiemensPLC
@@ -234,14 +213,6 @@ void TrigaServer::readModbusTCP(libModbusMaestecPLC& plc)
         data_local->CH_LOG = plc.get_Var2();
         data_local->CH_PAR = plc.get_Var1();
         data_local->CH_PER = plc.get_Var2();
-
-        #ifdef MuTeX
-        {
-            std::lock_guard<std::mutex> lock(plcMutex);
-            data_global_plc.store(data_local);
-        }
-        #else
-            data_global_plc.store(data_local);
-        #endif
+        data_global_plc.store(data_local);
     }
 }

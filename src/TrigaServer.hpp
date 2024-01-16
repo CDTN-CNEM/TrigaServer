@@ -30,10 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <boost/asio.hpp>
 #include <json/json.h>
 
-//#define MuTeX//Mutex para proteção de leitura e escrita
-#ifdef MuTeX
-    #include <mutex>
-#endif
+#define TestMax
 
 using boost::asio::ip::tcp;
 
@@ -52,12 +49,6 @@ class TrigaServer
         libModbusSystematomSPU spuChA;
         libModbusSystematomSPU spuChB;
         libModbusMaestecPLC    plc;
-
-        #ifdef MuTeX
-            std::mutex spuChAMutex;
-            std::mutex spuChBMutex;
-            std::mutex plcMutex;
-        #endif
 
         //Ponteiros inteligentes globais
         std::atomic<std::shared_ptr<SPU_DATA>> data_global_spuChA = std::make_shared<SPU_DATA>();
