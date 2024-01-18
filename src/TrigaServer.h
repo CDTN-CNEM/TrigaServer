@@ -20,8 +20,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #ifndef TRIGA_SERVER
 #define TRIGA_SERVER
 
-#include "estrutura.h"
-
 #include <libModbusSystematomSPU.h>
 #include <libModbusMaestecPLC.h>
 
@@ -34,6 +32,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define TestMax
 
 using boost::asio::ip::tcp;
+
+struct ALL_DATA
+{
+    PLC_DATA PLC;
+    SPU_DATA SPU_CHA;
+    SPU_DATA SPU_CHB;
+};
 
 class TrigaServer
 {
