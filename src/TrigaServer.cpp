@@ -16,44 +16,129 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
+//TrigaServer.cpp
 #include "TrigaServer.h"
+
+const char * JSON_TEMPLATE = 
+"{\n\
+    SPU_CHA: {\n\
+        READ: %d,\n\
+        N_DATA_FP: %f,\n\
+        T_DATA_FP: %f,\n\
+        F1_DATA_FP: %f,\n\
+        F2_DATA_FP: %f,\n\
+        F3_DATA_FP: %f,\n\
+        EMR_N_THRESHOLD: %f,\n\
+        WRN_N_THRESHOLD: %f,\n\
+        EMR_T_THRESHOLD: %f,\n\
+        WRN_T_THRESHOLD: %f,\n\
+        EMR_N: %d,\n\
+        WRN_N: %d,\n\
+        EMR_T: %d,\n\
+        WRN_T: %d,\n\
+        R1: %d,\n\
+        R2: %d,\n\
+        R3: %d,\n\
+        RDY: %d,\n\
+        TEST: %d,\n\
+        XXXX: %d\n\
+    },\n\
+    SPU_CHB: {\n\
+        READ: %d,\n\
+        N_DATA_FP: %f,\n\
+        T_DATA_FP: %f,\n\
+        F1_DATA_FP: %f,\n\
+        F2_DATA_FP: %f,\n\
+        F3_DATA_FP: %f,\n\
+        EMR_N_THRESHOLD: %f,\n\
+        WRN_N_THRESHOLD: %f,\n\
+        EMR_T_THRESHOLD: %f,\n\
+        WRN_T_THRESHOLD: %f,\n\
+        EMR_N: %d,\n\
+        WRN_N: %d,\n\
+        EMR_T: %d,\n\
+        WRN_T: %d,\n\
+        R1: %d,\n\
+        R2: %d,\n\
+        R3: %d,\n\
+        RDY: %d,\n\
+        TEST: %d,\n\
+        XXXX: %d\n\
+    },\n\
+    PLC: {\n\
+        READ: %d,\n\
+        IG01: %f,\n\
+        IG02: %f,\n\
+        IG03: %f,\n\
+        IG04: %f,\n\
+        JT01: %f,\n\
+        JT02: %f,\n\
+        JT03: %f,\n\
+        KT01: %f,\n\
+        TT01: %f,\n\
+        TT02: %f,\n\
+        TT03: %f,\n\
+        TT04: %f,\n\
+        TT05: %f,\n\
+        CT01: %f,\n\
+        CT02: %f,\n\
+        FI01: %f,\n\
+        FI02: %f,\n\
+        LT01: %f,\n\
+        PHT01: %f,\n\
+        TTXX: %f,\n\
+        TT06: %f,\n\
+        TT07: %f,\n\
+        TT08: %f,\n\
+        RT01: %f,\n\
+        RT02: %f,\n\
+        RT03: %f,\n\
+        RT04: %f,\n\
+        RT05: %f,\n\
+        RT06: %f,\n\
+        Reserva_AI11: %f,\n\
+        Reserva_AI12: %f,\n\
+        Reserva_AI13: %f,\n\
+        Reserva_AI14: %f,\n\
+        Reserva_AI15: %f,\n\
+        Reserva_AI16: %f,\n\
+        Reserva_AI17: %f,\n\
+        Reserva_AI18: %f,\n\
+        Reserva_AI19: %f,\n\
+        Reserva_AI20: %f,\n\
+        Reserva_AI21: %f\n\
+    },\n\
+}";
 
 TrigaServer::TrigaServer(std::string spu_sp1,//SPU_CH_A serial port
                          std::string spu_sp2,//SPU_CH_B serial port
                          std::string clp_ip, //CLP IP
-                         u_int16_t clp_port, //CPL Port
-                         boost::asio::io_service& io_service, //Service of server
-                         short port) //Port of server
+                         u_int16_t clp_port) //CPL Port
                         :spuChA(spu_sp1),
                          spuChB(spu_sp2),
-                         plc(clp_ip,clp_port),
-                         acceptor_(io_service,
-                         tcp::endpoint(tcp::v4(), port)),
-                         socket_(io_service)
+                         plc(clp_ip,clp_port)
 {
-    startThreads();
-    StartAccept();
 }
 
 
-void TrigaServer::startThreads() // Método para Threads
+TrigaServer::~TrigaServer() {
+    for(auto& thread : clientThreads) {
+        if(thread.joinable())
+            thread.join();
+    }
+}
+
+void TrigaServer::startReadThreads() // Método para Threads
 {
     //Iniciar todas as treads necessárias
     std::thread spuChAThread(&TrigaServer::readModbusRTU, this, std::ref(spuChA));
     std::thread spuChBThread(&TrigaServer::readModbusRTU, this, std::ref(spuChB));
-    std::thread plcThread   (&TrigaServer::readModbusTCP, this, std::ref(plc));
+    std::thread plcThread   (&TrigaServer::readOpcTCP,    this, std::ref(plc));
     #ifdef TestMax
-        std::thread serverThread0   (&TrigaServer::handleTCPClients, this);
-        std::thread serverThread1   (&TrigaServer::handleTCPClients, this);
-        std::thread serverThread2   (&TrigaServer::handleTCPClients, this);
-        std::thread serverThread3   (&TrigaServer::handleTCPClients, this);
-        std::thread serverThread4   (&TrigaServer::handleTCPClients, this);
-        std::thread serverThread5   (&TrigaServer::handleTCPClients, this);
-        std::thread serverThread6   (&TrigaServer::handleTCPClients, this);
-        std::thread serverThread7   (&TrigaServer::handleTCPClients, this);
-        std::thread serverThread8   (&TrigaServer::handleTCPClients, this);
-        std::thread serverThread9   (&TrigaServer::handleTCPClients, this);
+        for (int i = 0; i < 10; i++) {
+            std::thread serverThread(&TrigaServer::handleTCPClients, this);
+            serverThread.detach();
+        }
     #endif
 
     //Esperar todas as threads terminarem (idelmente não deveria terminar)
@@ -62,102 +147,123 @@ void TrigaServer::startThreads() // Método para Threads
     plcThread.join();
 }
 
-void TrigaServer::StartAccept() {
-    acceptor_.async_accept(socket_,
-        [this](boost::system::error_code ec) {
-            if (!ec) {
-                std::thread([this]() { handleTCPClients(); }).detach();
-            }
+void TrigaServer::startServer(int port, bool sendJson) {
+    int serverSocket, clientSocket;
+    struct sockaddr_in serverAddr, clientAddr;
+    socklen_t clientLen = sizeof(clientAddr);
 
-            StartAccept();
-        });
-}
-
-void TrigaServer::SendData(const ALL_DATA& data) {
-    // Converte a estrutura de dados para JSON
-    Json::Value jsonData;
-    jsonData["SPU_CHA_READ"           ].append(data.SPU_CHA.READ);
-    jsonData["SPU_CHA_N_DATA_FP"      ].append(data.SPU_CHA.N_DATA_FP);
-    jsonData["SPU_CHA_T_DATA_FP"      ].append(data.SPU_CHA.T_DATA_FP);
-    jsonData["SPU_CHA_F1_DATA_FP"     ].append(data.SPU_CHA.F1_DATA_FP);
-    jsonData["SPU_CHA_F2_DATA_FP"     ].append(data.SPU_CHA.F2_DATA_FP);
-    jsonData["SPU_CHA_F3_DATA_FP"     ].append(data.SPU_CHA.F3_DATA_FP);
-    jsonData["SPU_CHA_EMR_N_THRESHOLD"].append(data.SPU_CHA.EMR_N_THRESHOLD);
-    jsonData["SPU_CHA_WRN_N_THRESHOLD"].append(data.SPU_CHA.WRN_N_THRESHOLD);
-    jsonData["SPU_CHA_EMR_T_THRESHOLD"].append(data.SPU_CHA.EMR_T_THRESHOLD);
-    jsonData["SPU_CHA_WRN_T_THRESHOLD"].append(data.SPU_CHA.WRN_T_THRESHOLD);
-    jsonData["SPU_CHA_EMR_N"          ].append(data.SPU_CHA.EMR_N);
-    jsonData["SPU_CHA_WRN_N"          ].append(data.SPU_CHA.WRN_N);
-    jsonData["SPU_CHA_EMR_T"          ].append(data.SPU_CHA.EMR_T);
-    jsonData["SPU_CHA_WRN_T"          ].append(data.SPU_CHA.WRN_T);
-    jsonData["SPU_CHA_R1"             ].append(data.SPU_CHA.R1);
-    jsonData["SPU_CHA_R2"             ].append(data.SPU_CHA.R2);
-    jsonData["SPU_CHA_R3"             ].append(data.SPU_CHA.R3);
-    jsonData["SPU_CHA_RDY"            ].append(data.SPU_CHA.RDY);
-    jsonData["SPU_CHA_TEST"           ].append(data.SPU_CHA.TEST);
-    jsonData["SPU_CHA_XXXX"           ].append(data.SPU_CHA.XXXX);
-    jsonData["SPU_CHA_READ"           ].append(data.SPU_CHA.READ);
-    jsonData["SPU_CHB_N_DATA_FP"      ].append(data.SPU_CHB.N_DATA_FP);
-    jsonData["SPU_CHB_T_DATA_FP"      ].append(data.SPU_CHB.T_DATA_FP);
-    jsonData["SPU_CHB_F1_DATA_FP"     ].append(data.SPU_CHB.F1_DATA_FP);
-    jsonData["SPU_CHB_F2_DATA_FP"     ].append(data.SPU_CHB.F2_DATA_FP);
-    jsonData["SPU_CHB_F3_DATA_FP"     ].append(data.SPU_CHB.F3_DATA_FP);
-    jsonData["SPU_CHB_EMR_N_THRESHOLD"].append(data.SPU_CHB.EMR_N_THRESHOLD);
-    jsonData["SPU_CHB_WRN_N_THRESHOLD"].append(data.SPU_CHB.WRN_N_THRESHOLD);
-    jsonData["SPU_CHB_EMR_T_THRESHOLD"].append(data.SPU_CHB.EMR_T_THRESHOLD);
-    jsonData["SPU_CHB_WRN_T_THRESHOLD"].append(data.SPU_CHB.WRN_T_THRESHOLD);
-    jsonData["SPU_CHB_EMR_N"          ].append(data.SPU_CHB.EMR_N);
-    jsonData["SPU_CHB_WRN_N"          ].append(data.SPU_CHB.WRN_N);
-    jsonData["SPU_CHB_EMR_T"          ].append(data.SPU_CHB.EMR_T);
-    jsonData["SPU_CHB_WRN_T"          ].append(data.SPU_CHB.WRN_T);
-    jsonData["SPU_CHB_R1"             ].append(data.SPU_CHB.R1);
-    jsonData["SPU_CHB_R2"             ].append(data.SPU_CHB.R2);
-    jsonData["SPU_CHB_R3"             ].append(data.SPU_CHB.R3);
-    jsonData["SPU_CHB_RDY"            ].append(data.SPU_CHB.RDY);
-    jsonData["SPU_CHB_TEST"           ].append(data.SPU_CHB.TEST);
-    jsonData["SPU_CHB_XXXX"           ].append(data.SPU_CHB.XXXX);
-    jsonData["PLC_READ"               ].append(data.PLC.READ);
-    jsonData["PLC_CH_PAR"             ].append(data.PLC.CH_PAR);
-    jsonData["PLC_CH_LOG"             ].append(data.PLC.CH_LOG);
-    jsonData["PLC_CH_LIN"             ].append(data.PLC.CH_LIN);
-    jsonData["PLC_CH_PER"             ].append(data.PLC.CH_PER);
-    // Converte o JSON para string
-    Json::StreamWriterBuilder writer;
-    std::string jsonString = Json::writeString(writer, jsonData);
-
-    // Envia a string JSON para o cliente
-    boost::asio::write(socket_, boost::asio::buffer(jsonString.c_str(), jsonString.length()));
-}
-// Servidor TCP/IP
-void TrigaServer::handleTCPClients()
-{
-    while (true)
-    {
-        auto data_local_spuChA = std::shared_ptr <SPU_DATA> (new SPU_DATA);
-        auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
-        auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
-
-        data_local_spuChA = data_global_spuChA.load();
-        data_local_spuChB = data_global_spuChB.load();
-        data_local_plc = data_global_plc.load();
-
-        #ifndef TestMax
-        try {
-            // Leitura da taxa do cliente
-            float rate;
-            socket_.receive(boost::asio::buffer(&rate, sizeof(rate)));
-
-            // Enviar dados na taxa especificada
-            while (true) {
-                ALL_DATA data;
-                SendData(data);
-                std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000 / rate)));
-            }
-        } catch (const std::exception& e) {
-            std::cerr << "Erro na comunicação com o cliente: " << e.what() << std::endl;
-        }
-        #endif
+    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocket < 0) {
+        std::cerr << "[startServer] Error opening socket" << std::endl;
+        return;
     }
+
+    memset(&serverAddr, 0, sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    serverAddr.sin_port = htons(port);
+
+    if (bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
+        std::cerr << "[startServer] Error on binding" << std::endl;
+        return;
+    }
+
+    listen(serverSocket, 5);
+    std::cout << "[startServer] Server started on port " << port << std::endl;
+
+    while(true) {
+        clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddr, &clientLen);
+        if (clientSocket < 0) {
+            std::cerr << "[startServer] Error on accept" << std::endl;
+            continue;
+        }
+
+        std::cout << "[startServer] Client connected" << std::endl;
+        
+        std::thread clientThread(&TrigaServer::handleTCPClients, this, clientSocket, sendJson);
+        clientThread.detach();
+    }
+}
+
+void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
+{
+    int timeout = 2; // 2 seconds timeout
+    char buffer[1024];
+    int n = recv(clientSocket, buffer, sizeof(buffer), 0);
+    if (n <= 0)
+    {
+        std::cerr << "[handleTCPClients] Error receiving data" << std::endl;
+        close(clientSocket);
+        return;
+    }
+
+    // Parse received data (assuming it's a number)
+    int interval = std::stoi(std::string(buffer, n));
+
+    std::cout << "[handleTCPClients] Received interval: " << interval << "ms" << std::endl;
+
+    if(sendJson)
+    {
+        // Create new thread
+        std::thread([this, interval, clientSocket]()
+        {
+            while(true)
+            {
+                auto data_local_spuChA = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+                auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+                auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
+
+                data_local_spuChA = data_global_spuChA.load();
+                data_local_spuChB = data_global_spuChB.load();
+                data_local_plc = data_global_plc.load();
+
+                ALL_DATA data;
+                data.SPU_CHA = *data_local_spuChA;
+                data.SPU_CHB = *data_local_spuChB;
+                data.PLC    = *data_local_plc;
+                
+                // Send JSON data
+                std::string json = genJson(data); // Assuming all_data is accessible here
+
+                send(clientSocket, json.c_str(), json.size(), 0);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(interval));
+            }
+        }).detach();
+    }
+
+    // Create new thread
+    std::thread([this, interval, clientSocket]()
+    {
+        while(true)
+        {
+            auto data_local_spuChA = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+            auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+            auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
+
+            data_local_spuChA = data_global_spuChA.load();
+            data_local_spuChB = data_global_spuChB.load();
+            data_local_plc = data_global_plc.load();
+
+            #ifndef TestMax
+                ALL_DATA data;
+                data.SPU_CHA = *data_local_spuChA;
+                data.SPU_CHB = *data_local_spuChB;
+                data.PLC     = *data_local_plc;
+                
+                // Convert ALL_DATA to a char pointer
+                char* buffer = reinterpret_cast<char*>(&data);
+                size_t size = sizeof(data);
+
+                // Send data
+                send(clientSocket, buffer, size, 0);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(interval));
+            #endif
+        }
+    }).detach();
+    
+    
 }
 
 // Ler dados da SPU usando libModbusSystematomSPU
@@ -168,51 +274,109 @@ void TrigaServer::readModbusRTU(libModbusSystematomSPU& spu)
         //Criação do ponteiro inteligente local
         auto data_local = std::shared_ptr <SPU_DATA> (new SPU_DATA);
         //Realizando leitura e salvando informação se foi lido
-        data_local->READ = spu.readAllRegisters(100);
-        
-
-        // Se for lido, passar informações para o ponteiro inteligente local
-        if(data_local->READ)
-        {
-            // Obter os valores lidos
-            data_local->N_DATA_FP       = spu.get_N_DATA_FP();
-            data_local->T_DATA_FP       = spu.get_T_DATA_FP();
-            data_local->F1_DATA_FP      = spu.get_F1_DATA_FP();
-            data_local->F2_DATA_FP      = spu.get_F2_DATA_FP();
-            data_local->F3_DATA_FP      = spu.get_F3_DATA_FP();
-            data_local->EMR_N_THRESHOLD = spu.get_EMR_N_THRESHOLD();
-            data_local->WRN_N_THRESHOLD = spu.get_WRN_N_THRESHOLD();
-            data_local->EMR_T_THRESHOLD = spu.get_EMR_T_THRESHOLD();
-            data_local->WRN_T_THRESHOLD = spu.get_WRN_T_THRESHOLD();
-            data_local->EMR_N           = spu.get_EMR_N();
-            data_local->WRN_N           = spu.get_WRN_N();
-            data_local->EMR_T           = spu.get_EMR_T();
-            data_local->WRN_T           = spu.get_WRN_T();
-            data_local->R1              = spu.get_R1();
-            data_local->R2              = spu.get_R2();
-            data_local->R3              = spu.get_R3();
-            data_local->RDY             = spu.get_RDY();
-            data_local->TEST            = spu.get_TEST();
-            data_local->XXXX            = spu.get_XXXX();
-        }
-
+        *data_local  = spu.get_all();
         //Passar para o ponteiro inteligente global
         if (spu.get_portname() == "/dev/ttyF0") data_global_spuChA.store(data_local);
         else                                    data_global_spuChB.store(data_local);
     }
 }
+
 // Ler dados Modbus do PLC usando libModbusSiemensPLC
-void TrigaServer::readModbusTCP(libModbusMaestecPLC& plc) 
+void TrigaServer::readOpcTCP(libOpcMaestecPLC& plc) 
 {
     while (true)
     {
         auto data_local = std::shared_ptr <PLC_DATA> (new PLC_DATA);
-
-        data_local->READ   = 1;//plc.readAllRegisters(100);
-        data_local->CH_LIN = plc.get_Var1();
-        data_local->CH_LOG = plc.get_Var2();
-        data_local->CH_PAR = plc.get_Var1();
-        data_local->CH_PER = plc.get_Var2();
+        *data_local = plc.get_all();
         data_global_plc.store(data_local);
     }
+}
+
+std::string TrigaServer::genJson(ALL_DATA all_data) 
+{
+    char buffer[4096];
+    sprintf(buffer, JSON_TEMPLATE, all_data.SPU_CHA.READ,
+            all_data.SPU_CHA.N_DATA_FP,
+            all_data.SPU_CHA.T_DATA_FP,
+            all_data.SPU_CHA.F1_DATA_FP,
+            all_data.SPU_CHA.F2_DATA_FP,
+            all_data.SPU_CHA.F3_DATA_FP,
+            all_data.SPU_CHA.EMR_N_THRESHOLD,
+            all_data.SPU_CHA.WRN_N_THRESHOLD,
+            all_data.SPU_CHA.EMR_T_THRESHOLD,
+            all_data.SPU_CHA.WRN_T_THRESHOLD,
+            all_data.SPU_CHA.EMR_N,
+            all_data.SPU_CHA.WRN_N,
+            all_data.SPU_CHA.EMR_T,
+            all_data.SPU_CHA.WRN_T,
+            all_data.SPU_CHA.R1,
+            all_data.SPU_CHA.R2,
+            all_data.SPU_CHA.R3,
+            all_data.SPU_CHA.RDY,
+            all_data.SPU_CHA.TEST,
+            all_data.SPU_CHA.XXXX,
+
+            all_data.SPU_CHB.READ,
+            all_data.SPU_CHB.N_DATA_FP,
+            all_data.SPU_CHB.T_DATA_FP,
+            all_data.SPU_CHB.F1_DATA_FP,
+            all_data.SPU_CHB.F2_DATA_FP,
+            all_data.SPU_CHB.F3_DATA_FP,
+            all_data.SPU_CHB.EMR_N_THRESHOLD,
+            all_data.SPU_CHB.WRN_N_THRESHOLD,
+            all_data.SPU_CHB.EMR_T_THRESHOLD,
+            all_data.SPU_CHB.WRN_T_THRESHOLD,
+            all_data.SPU_CHB.EMR_N,
+            all_data.SPU_CHB.WRN_N,
+            all_data.SPU_CHB.EMR_T,
+            all_data.SPU_CHB.WRN_T,
+            all_data.SPU_CHB.R1,
+            all_data.SPU_CHB.R2,
+            all_data.SPU_CHB.R3,
+            all_data.SPU_CHB.RDY,
+            all_data.SPU_CHB.TEST,
+            all_data.SPU_CHB.XXXX,
+            
+            all_data.PLC.READ,
+            all_data.PLC.IG01,
+            all_data.PLC.IG02,
+            all_data.PLC.IG03,
+            all_data.PLC.IG04,
+            all_data.PLC.JT01,
+            all_data.PLC.JT02,
+            all_data.PLC.JT03,
+            all_data.PLC.KT01,
+            all_data.PLC.TT01,
+            all_data.PLC.TT02,
+            all_data.PLC.TT03,
+            all_data.PLC.TT04,
+            all_data.PLC.TT05,
+            all_data.PLC.CT01,
+            all_data.PLC.CT02,
+            all_data.PLC.FI01,
+            all_data.PLC.FI02,
+            all_data.PLC.LT01,
+            all_data.PLC.PHT01,
+            all_data.PLC.TTXX,
+            all_data.PLC.TT06,
+            all_data.PLC.TT07,
+            all_data.PLC.TT08,
+            all_data.PLC.RT01,
+            all_data.PLC.RT02,
+            all_data.PLC.RT03,
+            all_data.PLC.RT04,
+            all_data.PLC.RT05,
+            all_data.PLC.RT06,
+            all_data.PLC.Reserva_AI11,
+            all_data.PLC.Reserva_AI12,
+            all_data.PLC.Reserva_AI13,
+            all_data.PLC.Reserva_AI14,
+            all_data.PLC.Reserva_AI15,
+            all_data.PLC.Reserva_AI16,
+            all_data.PLC.Reserva_AI17,
+            all_data.PLC.Reserva_AI18,
+            all_data.PLC.Reserva_AI19,
+            all_data.PLC.Reserva_AI20,
+            all_data.PLC.Reserva_AI21);
+    return buffer;
 }

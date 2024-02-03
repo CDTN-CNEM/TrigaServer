@@ -19,21 +19,21 @@ pkg_search_module(jsoncpp REQUIRED IMPORTED_TARGET jsoncpp)
 
 FetchContent_Declare(
   libModbusSystematomSPU
-  GIT_REPOSITORY https://github.com/CDTNuclear/libModbusSystematomSPU
+  GIT_REPOSITORY https://github.com/SEURT-CDTN/libModbusSystematomSPU
   GIT_TAG main)
 
 FetchContent_Declare(
-  libModbusMaestecPLC
-  GIT_REPOSITORY https://github.com/CDTNuclear/libModbusMaestecPLC
+  libOpcMaestecPLC
+  GIT_REPOSITORY https://github.com/SEURT-CDTN/libOpcMaestecPLC
   GIT_TAG main)
 
-FetchContent_MakeAvailable(libModbusSystematomSPU libModbusMaestecPLC)
+FetchContent_MakeAvailable(libModbusSystematomSPU libOpcMaestecPLC)
 
 set(TRIGASERVER_SRC
     ${PROJECT_SOURCE_DIR}/src/main.cpp
     ${PROJECT_SOURCE_DIR}/src/TrigaServer.cpp
     ${libmodbussystematomspu_SOURCE_DIR}/libModbusSystematomSPU.cpp
-    ${libmodbusmaestecplc_SOURCE_DIR}/libModbusMaestecPLC.cpp)
+    ${libopcmaestecplc_SOURCE_DIR}/libOpcMaestecPLC.cpp)
 
 add_executable(trigaserver ${TRIGASERVER_SRC})
 
@@ -41,7 +41,7 @@ target_include_directories(
   trigaserver
   PRIVATE ${PROJECT_SOURCE_DIR}/src
           ${libmodbussystematomspu_SOURCE_DIR}
-          ${libmodbusmaestecplc_SOURCE_DIR}
+          ${libopcmaestecplc_SOURCE_DIR}
           ${Boost_INCLUDE_DIRS}
           ${CXXOPTS_INCLUDE_DIRS}
           ${MODBUS_INCLUDE_DIRS}

@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
+//main.cpp
 #include "TrigaServer.h"
 #include <cxxopts.hpp>
 #include <fstream>
@@ -38,34 +38,30 @@ void showLicense()
 
 struct CONFIG
 {
-    std::string spu_sp1;//SPU_CH_A serial port
-    std::string spu_sp2;//SPU_CH_B serial port
-    std::string clp_ip; //CLP IP
-    u_int16_t   clp_port; //CPL Port
-    short       port; //Port of server
+    std::string spu_sp1   = "/dev/ttyUSB0";//SPU_CH_A serial port
+    std::string spu_sp2   = "/dev/ttyUSB1";//SPU_CH_B serial port
+    std::string clp_ip    = "192.168.0.1"; //CLP IP
+    u_int16_t   clp_port  = 4843; //CPL Port
+    short       port_raw  = 1234; //Port of server
+    short       port_json = 12345; //Port of server
 };
 
 CONFIG readConfigFile(std::string filename)
 {
     CONFIG config;
-    config.spu_sp1  = "/dev/ttyF0";
-    config.spu_sp2  = "/dev/ttyF1";
-    config.clp_ip   = "127.0.0.1";
-    config.clp_port = 12345;
-    config.port     = 1234;
     
     std::ifstream configFile(filename);
     
     if (!configFile.is_open()) 
     {
-        std::cerr << "Erro ao abrir o arquivo de configuração: " << filename << std::endl;
+        std::cerr << "[readConfigFile] Erro ao abrir o arquivo de configuração: " << filename << std::endl;
         filename = "trigaserver.conf";
         std::ifstream configFile(filename);
-        std::cerr << "Tentando abrir: " << filename << std::endl;
+        std::cerr << "[readConfigFile] Tentando abrir: " << filename << std::endl;
         if (!configFile.is_open()) 
         {
-            std::cerr << "Erro ao abrir o arquivo de configuração: " << filename << std::endl;
-            std::cerr << "Configurações setadas como padrão" << std::endl;
+            std::cerr << "[readConfigFile] Erro ao abrir o arquivo de configuração: " << filename << std::endl;
+            std::cerr << "[readConfigFile] Configurações setadas como padrão" << std::endl;
             return config;
         }
     }
@@ -91,8 +87,10 @@ CONFIG readConfigFile(std::string filename)
                 config.clp_ip = value.c_str();
             } else if (key == "clp_port") {
                 config.clp_port = std::stoi(value);
+            } else if (key == "port_raw") {
+                config.port_raw = std::stoi(value);
             } else if (key == "port") {
-                config.port = std::stoi(value);
+                config.port_json = std::stoi(value);
             }
         }
     }
@@ -139,17 +137,30 @@ int main(int argc, char* argv[])
 
 
     CONFIG config = readConfigFile(filename);
-    try {
-        boost::asio::io_service io_service;
-        TrigaServer server(config.spu_sp1,
-                           config.spu_sp2, 
-                           config.clp_ip, 
-                           config.clp_port, 
-                           io_service, 
-                           config.port);
-        io_service.run();
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+    TrigaServer server(config.spu_sp1,
+                       config.spu_sp2, 
+                       config.clp_ip, 
+                       config.clp_port);
+    std::thread serverThread    (&TrigaServer::startServer, &server, config.port_raw, false);
+    std::thread serverJsonThread(&TrigaServer::startServer, &server, config.port_json,true);
+
+    serverThread.detach();
+    serverJsonThread.detach();
+
+    std::string input;
+    while (true) {
+        std::cout << "Enter command ('exit' to quit, 'reset' to reset server): " << std::endl;
+        std::cin >> input;
+
+        if (input == "exit") {
+            break;
+        } else if (input == "reset") {
+            server.~TrigaServer();
+            new (&server) TrigaServer(config.spu_sp1,
+                       config.spu_sp2, 
+                       config.clp_ip, 
+                       config.clp_port);
+        }
     }
     return 0;
 }
