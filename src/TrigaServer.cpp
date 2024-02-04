@@ -136,7 +136,7 @@ void TrigaServer::startReadThreads() // Método para Threads
     std::thread plcThread   (&TrigaServer::readOpcTCP,    this, std::ref(plc));
     #ifdef TestMax
         for (int i = 0; i < 10; i++) {
-            std::thread serverThread(&TrigaServer::handleTCPClients, this);
+            std::thread serverThread(&TrigaServer::handleTCPClients, this, false);
             serverThread.detach();
         }
     #endif
@@ -222,8 +222,7 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
                 data.SPU_CHB = *data_local_spuChB;
                 data.PLC    = *data_local_plc;
                 
-                // Send JSON data
-                std::string json = genJson(data); // Assuming all_data is accessible here
+                std::string json = genJson(data);
 
                 send(clientSocket, json.c_str(), json.size(), 0);
 
@@ -231,39 +230,39 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
             }
         }).detach();
     }
-
-    // Create new thread
-    std::thread([this, interval, clientSocket]()
+    else
     {
-        while(true)
+        // Create new thread
+        std::thread([this, interval, clientSocket]()
         {
-            auto data_local_spuChA = std::shared_ptr <SPU_DATA> (new SPU_DATA);
-            auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
-            auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
+            while(true)
+            {
+                auto data_local_spuChA = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+                auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+                auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
 
-            data_local_spuChA = data_global_spuChA.load();
-            data_local_spuChB = data_global_spuChB.load();
-            data_local_plc = data_global_plc.load();
+                data_local_spuChA = data_global_spuChA.load();
+                data_local_spuChB = data_global_spuChB.load();
+                data_local_plc = data_global_plc.load();
 
-            #ifndef TestMax
-                ALL_DATA data;
-                data.SPU_CHA = *data_local_spuChA;
-                data.SPU_CHB = *data_local_spuChB;
-                data.PLC     = *data_local_plc;
-                
-                // Convert ALL_DATA to a char pointer
-                char* buffer = reinterpret_cast<char*>(&data);
-                size_t size = sizeof(data);
+                #ifndef TestMax
+                    ALL_DATA data;
+                    data.SPU_CHA = *data_local_spuChA;
+                    data.SPU_CHB = *data_local_spuChB;
+                    data.PLC     = *data_local_plc;
+                    
+                    // Convert ALL_DATA to a char pointer
+                    char* buffer = reinterpret_cast<char*>(&data);
+                    size_t size = sizeof(data);
 
-                // Send data
-                send(clientSocket, buffer, size, 0);
+                    // Send data
+                    send(clientSocket, buffer, size, 0);
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(interval));
-            #endif
-        }
-    }).detach();
-    
-    
+                    std::this_thread::sleep_for(std::chrono::milliseconds(interval));
+                #endif
+            }
+        }).detach();
+    }
 }
 
 // Ler dados da SPU usando libModbusSystematomSPU
