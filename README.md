@@ -5,7 +5,7 @@ TrigaServer is a software for GNU operating system to get the real-time values o
 ## Clone and compiling
 
 ``` Bash
-git clone https://github.com/CDTNuclear/TrigaServer.git
+git clone https://github.com/SEURT-CDTN/TrigaServer.git
 mkdir -p build
 cd build
 cmake ..
