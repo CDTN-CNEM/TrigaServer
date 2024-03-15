@@ -66,54 +66,20 @@ const char * JSON_TEMPLATE =
         XXXX: %d\n\
     },\n\
     PLC: {\n\
-        READ: %d,\n\
-        IG01: %f,\n\
-        IG02: %f,\n\
-        IG03: %f,\n\
-        IG04: %f,\n\
-        JT01: %f,\n\
-        JT02: %f,\n\
-        JT03: %f,\n\
-        KT01: %f,\n\
-        TT01: %f,\n\
-        TT02: %f,\n\
-        TT03: %f,\n\
-        TT04: %f,\n\
-        TT05: %f,\n\
-        CT01: %f,\n\
-        CT02: %f,\n\
-        FI01: %f,\n\
-        FI02: %f,\n\
-        LT01: %f,\n\
-        PHT01: %f,\n\
-        TTXX: %f,\n\
-        TT06: %f,\n\
-        TT07: %f,\n\
-        TT08: %f,\n\
-        RT01: %f,\n\
-        RT02: %f,\n\
-        RT03: %f,\n\
-        RT04: %f,\n\
-        RT05: %f,\n\
-        RT06: %f,\n\
-        Reserva_AI11: %f,\n\
-        Reserva_AI12: %f,\n\
-        Reserva_AI13: %f,\n\
-        Reserva_AI14: %f,\n\
-        Reserva_AI15: %f,\n\
-        Reserva_AI16: %f,\n\
-        Reserva_AI17: %f,\n\
-        Reserva_AI18: %f,\n\
-        Reserva_AI19: %f,\n\
-        Reserva_AI20: %f,\n\
-        Reserva_AI21: %f\n\
+        STATE: %d,\n\
+        BarraReg: %f,\n\
+        BarraCon: %f,\n\
+        BarraSeg: %f,\n\
+        CLogALog: %f,\n\
+        CLogALin: %f,\n\
+        CLogAPer: %f,\n\
     },\n\
-}";
+}\n";
 
 TrigaServer::TrigaServer(std::string spu_sp1,//SPU_CH_A serial port
                          std::string spu_sp2,//SPU_CH_B serial port
                          std::string clp_ip, //CLP IP
-                         u_int16_t clp_port) //CPL Port
+                         std::string clp_port) //CPL Port
                         :spuChA(spu_sp1),
                          spuChB(spu_sp2),
                          plc(clp_ip,clp_port)
@@ -281,7 +247,7 @@ void TrigaServer::readModbusRTU(libModbusSystematomSPU& spu)
 }
 
 // Ler dados Modbus do PLC usando libModbusSiemensPLC
-void TrigaServer::readOpcTCP(libOpcMaestecPLC& plc) 
+void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc) 
 {
     while (true)
     {
@@ -336,46 +302,12 @@ std::string TrigaServer::genJson(ALL_DATA all_data)
             all_data.SPU_CHB.TEST,
             all_data.SPU_CHB.XXXX,
             
-            all_data.PLC.READ,
-            all_data.PLC.IG01,
-            all_data.PLC.IG02,
-            all_data.PLC.IG03,
-            all_data.PLC.IG04,
-            all_data.PLC.JT01,
-            all_data.PLC.JT02,
-            all_data.PLC.JT03,
-            all_data.PLC.KT01,
-            all_data.PLC.TT01,
-            all_data.PLC.TT02,
-            all_data.PLC.TT03,
-            all_data.PLC.TT04,
-            all_data.PLC.TT05,
-            all_data.PLC.CT01,
-            all_data.PLC.CT02,
-            all_data.PLC.FI01,
-            all_data.PLC.FI02,
-            all_data.PLC.LT01,
-            all_data.PLC.PHT01,
-            all_data.PLC.TTXX,
-            all_data.PLC.TT06,
-            all_data.PLC.TT07,
-            all_data.PLC.TT08,
-            all_data.PLC.RT01,
-            all_data.PLC.RT02,
-            all_data.PLC.RT03,
-            all_data.PLC.RT04,
-            all_data.PLC.RT05,
-            all_data.PLC.RT06,
-            all_data.PLC.Reserva_AI11,
-            all_data.PLC.Reserva_AI12,
-            all_data.PLC.Reserva_AI13,
-            all_data.PLC.Reserva_AI14,
-            all_data.PLC.Reserva_AI15,
-            all_data.PLC.Reserva_AI16,
-            all_data.PLC.Reserva_AI17,
-            all_data.PLC.Reserva_AI18,
-            all_data.PLC.Reserva_AI19,
-            all_data.PLC.Reserva_AI20,
-            all_data.PLC.Reserva_AI21);
+            all_data.PLC.STATE,
+            all_data.PLC.BarraReg,
+            all_data.PLC.BarraCon,
+            all_data.PLC.BarraSeg,
+            all_data.PLC.CLogALog,
+            all_data.PLC.CLogALin,
+            all_data.PLC.CLogAPer);
     return buffer;
 }

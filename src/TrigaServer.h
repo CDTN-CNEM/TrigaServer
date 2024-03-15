@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define TRIGA_SERVER
 
 #include <libModbusSystematomSPU.h>
-#include <libOpcMaestecPLC.h>
+#include <libOpcTrigaPLC.h>
 
 #include <iostream>
 #include <thread>
@@ -47,7 +47,7 @@ class TrigaServer
         TrigaServer(std::string spu_sp1, 
                     std::string spu_sp2, 
                     std::string clp_ip, 
-                    u_int16_t clp_port);
+                    std::string clp_port);
         ~TrigaServer();
         void startServer(int port, bool sendJson);
 
@@ -62,7 +62,7 @@ class TrigaServer
         // Objetos para comunicação Modbus nas duas portas seriais
         libModbusSystematomSPU spuChA;
         libModbusSystematomSPU spuChB;
-        libOpcMaestecPLC    plc;
+        libOpcTrigaPLC    plc;
 
         //Ponteiros inteligentes globais
         std::atomic<std::shared_ptr<SPU_DATA>> data_global_spuChA = std::make_shared<SPU_DATA>();
@@ -72,7 +72,7 @@ class TrigaServer
         //Threads de leitura de hardware
         void startReadThreads();
         void readModbusRTU(libModbusSystematomSPU& spu);
-        void readOpcTCP(libOpcMaestecPLC& plc);
+        void readOpcTCP(libOpcTrigaPLC& plc);
 };
 
 #endif

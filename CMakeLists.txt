@@ -23,17 +23,22 @@ FetchContent_Declare(
   GIT_TAG main)
 
 FetchContent_Declare(
-  libOpcMaestecPLC
-  GIT_REPOSITORY https://github.com/SEURT-CDTN/libOpcMaestecPLC
+  libOpcTrigaPLC
+  GIT_REPOSITORY https://github.com/SEURT-CDTN/libOpcTrigaPLC
   GIT_TAG main)
 
-FetchContent_MakeAvailable(libModbusSystematomSPU libOpcMaestecPLC)
+FetchContent_Declare(
+  open62541pp
+  GIT_REPOSITORY https://github.com/open62541pp/open62541pp
+  GIT_TAG master)
+
+FetchContent_MakeAvailable(libModbusSystematomSPU libOpcTrigaPLC open62541pp)
 
 set(TRIGASERVER_SRC
     ${PROJECT_SOURCE_DIR}/src/main.cpp
     ${PROJECT_SOURCE_DIR}/src/TrigaServer.cpp
     ${libmodbussystematomspu_SOURCE_DIR}/libModbusSystematomSPU.cpp
-    ${libopcmaestecplc_SOURCE_DIR}/libOpcMaestecPLC.cpp)
+    ${libOpcTrigaPLC_SOURCE_DIR}/libOpcTrigaPLC.cpp)
 
 add_executable(trigaserver ${TRIGASERVER_SRC})
 
@@ -41,7 +46,8 @@ target_include_directories(
   trigaserver
   PRIVATE ${PROJECT_SOURCE_DIR}/src
           ${libmodbussystematomspu_SOURCE_DIR}
-          ${libopcmaestecplc_SOURCE_DIR}
+          ${libOpcTrigaPLC_SOURCE_DIR}
+          ${open62541pp_SOURCE_DIR}/include
           ${Boost_INCLUDE_DIRS}
           ${CXXOPTS_INCLUDE_DIRS}
           ${MODBUS_INCLUDE_DIRS}
@@ -50,7 +56,7 @@ target_include_directories(
 
 target_link_libraries(
   trigaserver PRIVATE ${Boost_LIBRARIES} PkgConfig::cxxopts PkgConfig::Modbus
-                      PkgConfig::SerialPort PkgConfig::jsoncpp)
+                      PkgConfig::SerialPort PkgConfig::jsoncpp open62541pp)
 
 target_compile_options(
   trigaserver PRIVATE ${CXXOPTS_CFLAGS_OTHER} ${MODBUS_CFLAGS_OTHER}

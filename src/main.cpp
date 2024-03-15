@@ -41,7 +41,7 @@ struct CONFIG
     std::string spu_sp1   = "/dev/ttyUSB0";//SPU_CH_A serial port
     std::string spu_sp2   = "/dev/ttyUSB1";//SPU_CH_B serial port
     std::string clp_ip    = "192.168.0.1"; //CLP IP
-    u_int16_t   clp_port  = 4843; //CPL Port
+    std::string clp_port  = "4843"; //CPL Port
     short       port_raw  = 1234; //Port of server
     short       port_json = 12345; //Port of server
 };
