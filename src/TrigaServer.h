@@ -62,7 +62,7 @@ class TrigaServer
         // Objetos para comunicação Modbus nas duas portas seriais
         libModbusSystematomSPU spuChA;
         libModbusSystematomSPU spuChB;
-        libOpcTrigaPLC    plc;
+        libOpcTrigaPLC         plc;
 
         //Ponteiros inteligentes globais
         std::atomic<std::shared_ptr<SPU_DATA>> data_global_spuChA = std::make_shared<SPU_DATA>();

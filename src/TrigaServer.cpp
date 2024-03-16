@@ -19,63 +19,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //TrigaServer.cpp
 #include "TrigaServer.h"
 
-const char * JSON_TEMPLATE = 
-"{\n\
-    SPU_CHA: {\n\
-        READ: %d,\n\
-        N_DATA_FP: %f,\n\
-        T_DATA_FP: %f,\n\
-        F1_DATA_FP: %f,\n\
-        F2_DATA_FP: %f,\n\
-        F3_DATA_FP: %f,\n\
-        EMR_N_THRESHOLD: %f,\n\
-        WRN_N_THRESHOLD: %f,\n\
-        EMR_T_THRESHOLD: %f,\n\
-        WRN_T_THRESHOLD: %f,\n\
-        EMR_N: %d,\n\
-        WRN_N: %d,\n\
-        EMR_T: %d,\n\
-        WRN_T: %d,\n\
-        R1: %d,\n\
-        R2: %d,\n\
-        R3: %d,\n\
-        RDY: %d,\n\
-        TEST: %d,\n\
-        XXXX: %d\n\
-    },\n\
-    SPU_CHB: {\n\
-        READ: %d,\n\
-        N_DATA_FP: %f,\n\
-        T_DATA_FP: %f,\n\
-        F1_DATA_FP: %f,\n\
-        F2_DATA_FP: %f,\n\
-        F3_DATA_FP: %f,\n\
-        EMR_N_THRESHOLD: %f,\n\
-        WRN_N_THRESHOLD: %f,\n\
-        EMR_T_THRESHOLD: %f,\n\
-        WRN_T_THRESHOLD: %f,\n\
-        EMR_N: %d,\n\
-        WRN_N: %d,\n\
-        EMR_T: %d,\n\
-        WRN_T: %d,\n\
-        R1: %d,\n\
-        R2: %d,\n\
-        R3: %d,\n\
-        RDY: %d,\n\
-        TEST: %d,\n\
-        XXXX: %d\n\
-    },\n\
-    PLC: {\n\
-        STATE: %d,\n\
-        BarraReg: %f,\n\
-        BarraCon: %f,\n\
-        BarraSeg: %f,\n\
-        CLogALog: %f,\n\
-        CLogALin: %f,\n\
-        CLogAPer: %f,\n\
-    },\n\
-}\n";
-
 TrigaServer::TrigaServer(std::string spu_sp1,//SPU_CH_A serial port
                          std::string spu_sp2,//SPU_CH_B serial port
                          std::string clp_ip, //CLP IP
@@ -257,10 +200,90 @@ void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc)
     }
 }
 
+const char * JSON_TEMPLATE = 
+    "{\n\
+        SPU_CHA: {\n\
+            READ: %d,\n\
+            N_DATA_FP: %f,\n\
+            T_DATA_FP: %f,\n\
+            F1_DATA_FP: %f,\n\
+            F2_DATA_FP: %f,\n\
+            F3_DATA_FP: %f,\n\
+            EMR_N_THRESHOLD: %f,\n\
+            WRN_N_THRESHOLD: %f,\n\
+            EMR_T_THRESHOLD: %f,\n\
+            WRN_T_THRESHOLD: %f,\n\
+            EMR_N: %d,\n\
+            WRN_N: %d,\n\
+            EMR_T: %d,\n\
+            WRN_T: %d,\n\
+            R1: %d,\n\
+            R2: %d,\n\
+            R3: %d,\n\
+            RDY: %d,\n\
+            TEST: %d,\n\
+            XXXX: %d\n\
+        },\n\
+        SPU_CHB: {\n\
+            READ: %d,\n\
+            N_DATA_FP: %f,\n\
+            T_DATA_FP: %f,\n\
+            F1_DATA_FP: %f,\n\
+            F2_DATA_FP: %f,\n\
+            F3_DATA_FP: %f,\n\
+            EMR_N_THRESHOLD: %f,\n\
+            WRN_N_THRESHOLD: %f,\n\
+            EMR_T_THRESHOLD: %f,\n\
+            WRN_T_THRESHOLD: %f,\n\
+            EMR_N: %d,\n\
+            WRN_N: %d,\n\
+            EMR_T: %d,\n\
+            WRN_T: %d,\n\
+            R1: %d,\n\
+            R2: %d,\n\
+            R3: %d,\n\
+            RDY: %d,\n\
+            TEST: %d,\n\
+            XXXX: %d\n\
+        },\n\
+        PLC: {\n\
+            STATE: %d,\n\
+            BarraReg: %f,\n\
+            BarraCon: %f,\n\
+            BarraSeg: %f,\n\
+            CLogALog: %f,\n\
+            CLogALin: %f,\n\
+            CLogAPer: %f,\n\
+            CParALin: %f,\n\
+            CParALog: %f,\n\
+            CParAPer: %f,\n\
+            CLogARea: %f,\n\
+            CLin: %f,\n\
+            CPer: %f,\n\
+            SRadAre: %f,\n\
+            SRadEntPri: %f,\n\
+            SRadPoc: %f,\n\
+            SRadRes: %f,\n\
+            SRadSaiSec: %f,\n\
+            SRadAer: %f,\n\
+            VasPri: %f,\n\
+            SPt100Poco: %f,\n\
+            SPt100EntPri: %f,\n\
+            SPt100SaiPri: %f,\n\
+            SPt100EntSec: %f,\n\
+            SPt100SaiSec: %f,\n\
+            STpPoc1: %f,\n\
+            STpPoc2: %f,\n\
+            STpLen: %f,\n\
+            SConPoc: %f,\n\
+            SConSaiPri: %f,\n\
+        },\n\
+    }\n";
+
 std::string TrigaServer::genJson(ALL_DATA all_data) 
 {
     char buffer[4096];
-    sprintf(buffer, JSON_TEMPLATE, all_data.SPU_CHA.READ,
+    sprintf(buffer, JSON_TEMPLATE, all_data.SPU_CHA.STATE,
             all_data.SPU_CHA.N_DATA_FP,
             all_data.SPU_CHA.T_DATA_FP,
             all_data.SPU_CHA.F1_DATA_FP,
@@ -281,7 +304,7 @@ std::string TrigaServer::genJson(ALL_DATA all_data)
             all_data.SPU_CHA.TEST,
             all_data.SPU_CHA.XXXX,
 
-            all_data.SPU_CHB.READ,
+            all_data.SPU_CHB.STATE,
             all_data.SPU_CHB.N_DATA_FP,
             all_data.SPU_CHB.T_DATA_FP,
             all_data.SPU_CHB.F1_DATA_FP,
@@ -308,6 +331,30 @@ std::string TrigaServer::genJson(ALL_DATA all_data)
             all_data.PLC.BarraSeg,
             all_data.PLC.CLogALog,
             all_data.PLC.CLogALin,
-            all_data.PLC.CLogAPer);
+            all_data.PLC.CLogAPer,
+            all_data.PLC.CParALin,
+            all_data.PLC.CParALog,
+            all_data.PLC.CParAPer,
+            all_data.PLC.CLogARea,
+            all_data.PLC.CLin,
+            all_data.PLC.CPer,
+            all_data.PLC.SRadAre,
+            all_data.PLC.SRadEntPri,
+            all_data.PLC.SRadPoc,
+            all_data.PLC.SRadRes,
+            all_data.PLC.SRadSaiSec,
+            all_data.PLC.SRadAer,
+            all_data.PLC.VasPri,
+            all_data.PLC.SPt100Poco,
+            all_data.PLC.SPt100EntPri,
+            all_data.PLC.SPt100SaiPri,
+            all_data.PLC.SPt100EntSec,
+            all_data.PLC.SPt100SaiSec,
+            all_data.PLC.STpPoc1,
+            all_data.PLC.STpPoc2,
+            all_data.PLC.STpLen,
+            all_data.PLC.SConPoc,
+            all_data.PLC.SConSaiPri
+            );
     return buffer;
 }
