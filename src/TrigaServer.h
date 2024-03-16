@@ -64,10 +64,14 @@ class TrigaServer
         libModbusSystematomSPU spuChB;
         libOpcTrigaPLC         plc;
 
+        // Variáveis para armezenar o endereço da SPU A e B.
+        std::string adressSpuA;
+        std::string adressSpuB;
+
         //Ponteiros inteligentes globais
-        std::atomic<std::shared_ptr<SPU_DATA>> data_global_spuChA = std::make_shared<SPU_DATA>();
-        std::atomic<std::shared_ptr<SPU_DATA>> data_global_spuChB = std::make_shared<SPU_DATA>();
-        std::atomic<std::shared_ptr<PLC_DATA>> data_global_plc    = std::make_shared<PLC_DATA>();
+        std::atomic<std::shared_ptr<SPU_DATA>> data_global_spuCh[2] = {std::make_shared<SPU_DATA>(),
+                                                                       std::make_shared<SPU_DATA>()};
+        std::atomic<std::shared_ptr<PLC_DATA>> data_global_plc      =  std::make_shared<PLC_DATA>();
 
         //Threads de leitura de hardware
         void startReadThreads();

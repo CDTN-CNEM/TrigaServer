@@ -27,6 +27,8 @@ TrigaServer::TrigaServer(std::string spu_sp1,//SPU_CH_A serial port
                          spuChB(spu_sp2),
                          plc(clp_ip,clp_port)
 {
+    adressSpuA = spu_sp1;
+    adressSpuB = spu_sp2;
 }
 
 
@@ -122,8 +124,8 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
                 auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
                 auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
 
-                data_local_spuChA = data_global_spuChA.load();
-                data_local_spuChB = data_global_spuChB.load();
+                data_local_spuChA = data_global_spuCh[0].load();
+                data_local_spuChB = data_global_spuCh[1].load();
                 data_local_plc = data_global_plc.load();
 
                 ALL_DATA data;
@@ -150,9 +152,9 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
                 auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
                 auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
 
-                data_local_spuChA = data_global_spuChA.load();
-                data_local_spuChB = data_global_spuChB.load();
-                data_local_plc = data_global_plc.load();
+                data_local_spuChA = data_global_spuCh[0].load();
+                data_local_spuChB = data_global_spuCh[1].load();
+                data_local_plc    = data_global_plc.load();
 
                 #ifndef TestMax
                     ALL_DATA data;
@@ -177,15 +179,25 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
 // Ler dados da SPU usando libModbusSystematomSPU
 void TrigaServer::readModbusRTU(libModbusSystematomSPU& spu)
 {
+    //Criação do ponteiro inteligente local
+    auto data_local = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+
+    //Definindo qual SPU essa thread representa
+    int adressSpu;
+    if      (spu.get_portname() == adressSpuB) adressSpu = 0;
+    else if (spu.get_portname() == adressSpuA) adressSpu = 1;
+    else
+    {
+        std::cerr << "ERRO TrigaServer::readModbusRTU: erro em get_portname()";
+        return;
+    }
+
     while (true)
     {
-        //Criação do ponteiro inteligente local
-        auto data_local = std::shared_ptr <SPU_DATA> (new SPU_DATA);
         //Realizando leitura e salvando informação se foi lido
         *data_local  = spu.get_all();
-        //Passar para o ponteiro inteligente global
-        if (spu.get_portname() == "/dev/ttyF0") data_global_spuChA.store(data_local);
-        else                                    data_global_spuChB.store(data_local);
+        //Passar para o ponteiro inteligente global spuChA
+        data_global_spuCh[adressSpu].store(data_local);
     }
 }
 
