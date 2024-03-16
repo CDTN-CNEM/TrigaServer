@@ -21,6 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cxxopts.hpp>
 #include <fstream>
 #include <string>
+#include <chrono>
 
 void showVersion()
 {
@@ -147,6 +148,8 @@ int main(int argc, char* argv[])
     serverThread.detach();
     serverJsonThread.detach();
 
+    //Espere 1 segundo antes de abrir o shell
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     std::string input;
     while (true) {
         std::cout << "Enter command ('exit' to quit, 'reset' to reset server): " << std::endl;
