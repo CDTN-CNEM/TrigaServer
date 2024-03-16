@@ -198,17 +198,23 @@ void TrigaServer::readModbusRTU(libModbusSystematomSPU& spu)
         *data_local  = spu.get_all();
         //Passar para o ponteiro inteligente global spuChA
         data_global_spuCh[adressSpu].store(data_local);
+        //Se o valor de STATE for diferente de 0 (lido com sucesso) pause a thread por 1 segundo
+        if(data_local->STATE) std::this_thread::sleep_for(std::chrono::seconds(1));
+        //OBS: A pausa TEM que ser depois de armazenar data_local no ponteiro global
+        //Caso contrario o valor poderá ficar congelado no ponteiro global com STATE = 0.
     }
 }
 
 // Ler dados Modbus do PLC usando libModbusSiemensPLC
 void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc) 
 {
+    //Mesma lógica de readModbusRTU
+    auto data_local = std::shared_ptr <PLC_DATA> (new PLC_DATA);
     while (true)
     {
-        auto data_local = std::shared_ptr <PLC_DATA> (new PLC_DATA);
         *data_local = plc.get_all();
         data_global_plc.store(data_local);
+        if(data_local->STATE) std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 

@@ -25,6 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <iostream>
 #include <thread>
+#include <chrono>
 #include <memory>
 #include <boost/asio.hpp>
 #include <json/json.h>
