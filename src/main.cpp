@@ -41,10 +41,11 @@ struct CONFIG
 {
     std::string spu_sp1   = "/dev/ttyUSB0";//SPU_CH_A serial port
     std::string spu_sp2   = "/dev/ttyUSB1";//SPU_CH_B serial port
-    std::string clp_ip    = "192.168.0.1"; //CLP IP
-    std::string clp_port  = "4843"; //CPL Port
-    short       port_raw  = 1234; //Port of server
-    short       port_json = 12345; //Port of server
+    std::string plc       = "192.168.0.1:4048"; //PLC IP:PORT
+    short       port_raw  = 1234; //Port of server RAW
+    short       port_json = 12345; //Port of server JSON
+    int         error_interval_spu = 2;//
+    int         error_interval_plc = 2;//
 };
 
 CONFIG readConfigFile(std::string filename)
@@ -80,18 +81,20 @@ CONFIG readConfigFile(std::string filename)
             value.erase(0, value.find_first_not_of(" \t"));
             value.erase(value.find_last_not_of(" \t") + 1);
 
-            if (key == "spu_sp1") {
+            if        (key == "spu_sp1") {
                 config.spu_sp1 = value.c_str();
             } else if (key == "spu_sp2") {
                 config.spu_sp2 = value.c_str();
-            } else if (key == "clp_ip") {
-                config.clp_ip = value.c_str();
-            } else if (key == "clp_port") {
-                config.clp_port = std::stoi(value);
+            } else if (key == "clp") {
+                config.clp = value.c_str();
+            } else if (key == "port_json") {
+                config.port_json = std::stoi(value);
             } else if (key == "port_raw") {
                 config.port_raw = std::stoi(value);
-            } else if (key == "port") {
-                config.port_json = std::stoi(value);
+            } else if (key == "error_interval_spu") {
+                config.error_interval_spu = std::stoi(value);
+            } else if (key == "error_interval_plc") {
+                config.error_interval_plc = std::stoi(value);
             }
         }
     }
@@ -140,30 +143,38 @@ int main(int argc, char* argv[])
     CONFIG config = readConfigFile(filename);
     TrigaServer server(config.spu_sp1,
                        config.spu_sp2, 
-                       config.clp_ip, 
-                       config.clp_port);
-    std::thread serverThread    (&TrigaServer::startServer, &server, config.port_raw, false);
-    std::thread serverJsonThread(&TrigaServer::startServer, &server, config.port_json,true);
+                       config.clp, 
+                       config.error_interval_spu,
+                       config.error_interval_plc);
+    std::thread serverThread    (&TrigaServer::createServer, &server, config.port_raw, false);
+    std::thread serverJsonThread(&TrigaServer::createServer, &server, config.port_json,true);
 
     serverThread.detach();
     serverJsonThread.detach();
 
-    //Espere 1 segundo antes de abrir o shell
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::string input;
-    while (true) {
-        std::cout << "Enter command ('exit' to quit, 'reset' to reset server): " << std::endl;
-        std::cin >> input;
-
-        if (input == "exit") {
-            break;
-        } else if (input == "reset") {
-            server.~TrigaServer();
-            new (&server) TrigaServer(config.spu_sp1,
-                       config.spu_sp2, 
-                       config.clp_ip, 
-                       config.clp_port);
-        }
+    //Monitor de sistema
+    while (true)
+    {
+        //Espere 1 segundo antes de abrir o monitor e a cada loop
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::vector<int> state = server.state();
+        std::vector<float> PP = server.readPP();
+        system("clear");
+        std::cout << "TrigaServer - System Monitor\n";
+        std::cout << "\nClients Side\n";
+        std::cout << "Server JSON:  STATE=" << "?" << "    PORT=" << config.port_raw << "\n";
+        std::cout << "Server  RAW:  STATE=" << "?" << "    PORT=" << config.port_json<< "\n";
+        std::cout << "Num. Clients: " << "?" << "\n";
+        std::cout << "\nMachine Side\n";
+        std::cout << "SPU_A:    STATE=" << state[0] << "    PORT=" << config.spu_sp1 << "\n";
+        std::cout << "SPU_B:    STATE=" << state[1] << "    PORT=" << config.spu_sp2 << "\n";
+        std::cout << "PLC:      STATE=" << state[2] << "    PORT=" << config.clp_ip << ":" <<config.clp_port << "\n";
+        std::cout << "\nImportante Values\n";
+        std::cout << "SPU_A:    N=" << PP[0] << "\t\tT=" << PP[1] << "\n";
+        std::cout << "SPU_B:    N=" << PP[2] << "\t\tT=" << PP[3] << "\n";
+        std::cout << "PLC:      N=" << PP[4] << "\t\tT=" << PP[5] << "\n";
+        std::cout << "      N_log=" << PP[6] << "\n";
+        std::cout << "\n";
     }
     return 0;
 }

@@ -21,23 +21,46 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 TrigaServer::TrigaServer(std::string spu_sp1,//SPU_CH_A serial port
                          std::string spu_sp2,//SPU_CH_B serial port
-                         std::string clp_ip, //CLP IP
-                         std::string clp_port) //CPL Port
+                         std::string clp, //CLP IP
+                         int error_interval_plc,
+                         int error_interval_spu) //CPL Port
                         :spuChA(spu_sp1),
                          spuChB(spu_sp2),
-                         plc(clp_ip,clp_port)
+                         plc(clp)
 {
     adressSpuA = spu_sp1;
     adressSpuB = spu_sp2;
+    errorIntervalSPU = error_interval_plc;
+    errorIntervalPLC = error_interval_spu;
     startReadThreads();
 }
 
+TrigaServer::~TrigaServer() {}
 
-TrigaServer::~TrigaServer() {
-    for(auto& thread : clientThreads) {
-        if(thread.joinable())
-            thread.join();
-    }
+std::vector<int> TrigaServer::state()
+{
+    auto localSpuA = data_global_spuCh[0].load();
+    auto localSpuB = data_global_spuCh[1].load();
+    auto localPlc = data_global_plc.load();
+
+    return {localSpuA.get()->STATE,
+            localSpuB.get()->STATE,
+            localPlc.get()->STATE};
+}
+
+std::vector<float> TrigaServer::readPP()
+{
+    auto localSpuA = data_global_spuCh[0].load();
+    auto localSpuB = data_global_spuCh[1].load();
+    auto localPlc = data_global_plc.load();
+
+    return {localSpuA.get()->N_DATA_FP,
+            localSpuA.get()->T_DATA_FP,
+            localSpuB.get()->N_DATA_FP,
+            localSpuB.get()->T_DATA_FP,
+            localPlc.get()->CLogALin,
+            localPlc.get()->CLogALog,
+            localPlc.get()->CLogAPer};
 }
 
 void TrigaServer::startReadThreads() // Método para Threads
@@ -53,13 +76,13 @@ void TrigaServer::startReadThreads() // Método para Threads
         }
     #endif
 
-    //Esperar todas as threads terminarem (idelmente não deveria terminar)
-    spuChAThread.join();
-    spuChBThread.join();
-    plcThread.join();
+    //Desatar das readThreads
+    spuChAThread.detach();
+    spuChBThread.detach();
+    plcThread.detach();
 }
 
-void TrigaServer::startServer(int port, bool sendJson) {
+void TrigaServer::createServer(int port, bool sendJson) {
     int serverSocket, clientSocket;
     struct sockaddr_in serverAddr, clientAddr;
     socklen_t clientLen = sizeof(clientAddr);
@@ -81,7 +104,7 @@ void TrigaServer::startServer(int port, bool sendJson) {
     }
 
     listen(serverSocket, 5);
-    std::cout << "[startServer] Server started on port " << port << std::endl;
+    //std::cout << "[startServer] Server started on port " << port << std::endl;
 
     while(true) {
         clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddr, &clientLen);
@@ -90,7 +113,7 @@ void TrigaServer::startServer(int port, bool sendJson) {
             continue;
         }
 
-        std::cout << "[startServer] Client connected" << std::endl;
+        //std::cout << "[startServer] Client connected" << std::endl;
         
         std::thread clientThread(&TrigaServer::handleTCPClients, this, clientSocket, sendJson);
         clientThread.detach();
@@ -112,19 +135,18 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
     // Parse received data (assuming it's a number)
     int interval = std::stoi(std::string(buffer, n));
 
-    std::cout << "[handleTCPClients] Received interval: " << interval << "ms" << std::endl;
+    //std::cout << "[handleTCPClients] Received interval: " << interval << "ms" << std::endl;
 
     if(sendJson)
     {
         // Create new thread
         std::thread([this, interval, clientSocket]()
         {
+            auto data_local_spuChA = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+            auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+            auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
             while(true)
             {
-                auto data_local_spuChA = std::shared_ptr <SPU_DATA> (new SPU_DATA);
-                auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
-                auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
-
                 data_local_spuChA = data_global_spuCh[0].load();
                 data_local_spuChB = data_global_spuCh[1].load();
                 data_local_plc = data_global_plc.load();
@@ -147,18 +169,17 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
         // Create new thread
         std::thread([this, interval, clientSocket]()
         {
+            auto data_local_spuChA = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+            auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
+            auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
+            ALL_DATA data;
             while(true)
             {
-                auto data_local_spuChA = std::shared_ptr <SPU_DATA> (new SPU_DATA);
-                auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
-                auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
-
                 data_local_spuChA = data_global_spuCh[0].load();
                 data_local_spuChB = data_global_spuCh[1].load();
                 data_local_plc    = data_global_plc.load();
 
                 #ifndef TestMax
-                    ALL_DATA data;
                     data.SPU_CHA = *data_local_spuChA;
                     data.SPU_CHB = *data_local_spuChB;
                     data.PLC     = *data_local_plc;
@@ -199,10 +220,10 @@ void TrigaServer::readModbusRTU(libModbusSystematomSPU& spu)
         *data_local  = spu.get_all();
         //Passar para o ponteiro inteligente global spuChA
         data_global_spuCh[adressSpu].store(data_local);
-        //Se o valor de STATE for diferente de 0 (lido com sucesso) pause a thread por 1 segundo e tente reconectar
+        //Se o valor de STATE for igual a 2 (desconectado) pause a thread por 1 segundo e tente reconectar
         if(data_local->STATE==2) 
         {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(errorIntervalSPU));
             spu.tryConnect();
         }
         //OBS: A pausa TEM que ser depois de armazenar data_local no ponteiro global
@@ -221,7 +242,7 @@ void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc)
         data_global_plc.store(data_local);
         if(data_local->STATE==2) //Caso o erro seja "desconexão"
         {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(errorIntervalPLC));
             plc.tryConnect();
         }
     }

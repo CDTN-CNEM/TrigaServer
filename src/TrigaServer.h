@@ -47,19 +47,21 @@ class TrigaServer
     public:
         TrigaServer(std::string spu_sp1, 
                     std::string spu_sp2, 
-                    std::string clp_ip, 
-                    std::string clp_port);
+                    std::string clp, 
+                    int error_interval_plc,
+                    int error_interval_spu);
         ~TrigaServer();
-        void startServer(int port, bool sendJson);
+
+        //Função que cria servidor TCP
+        void createServer(int port, bool sendJson);
+
+        //Função para leitura de estados das readThreads
+        std::vector<int> state();
+
+        //Função para leitura dos valores de potência e periodo
+        std::vector<float> readPP();
 
     private:
-        std::string genJson(ALL_DATA all_data);
-        void handleTCPClients(int clientSocket, bool sendJson);
-        std::vector<std::thread> clientThreads;
-        std::mutex mtx;
-        std::condition_variable cv;
-        bool ready = false;
-
         // Objetos para comunicação Modbus nas duas portas seriais
         libModbusSystematomSPU spuChA;
         libModbusSystematomSPU spuChB;
@@ -69,10 +71,20 @@ class TrigaServer
         std::string adressSpuA;
         std::string adressSpuB;
 
+        //Variáveis para armezenar o intervalo de reconexão em caso de erro
+        int errorIntervalSPU;
+        int errorIntervalPLC;
+
         //Ponteiros inteligentes globais
         std::atomic<std::shared_ptr<SPU_DATA>> data_global_spuCh[2] = {std::make_shared<SPU_DATA>(),
                                                                        std::make_shared<SPU_DATA>()};
         std::atomic<std::shared_ptr<PLC_DATA>> data_global_plc      =  std::make_shared<PLC_DATA>();
+
+        // Função para gerar string JSON com todos os dados
+        std::string genJson(ALL_DATA all_data);
+
+        //Função que lida com os clientes (recebe o valor de intervalo e cria uma thread para cada cliente)
+        void handleTCPClients(int clientSocket, bool sendJson);
 
         //Threads de leitura de hardware
         void startReadThreads();
