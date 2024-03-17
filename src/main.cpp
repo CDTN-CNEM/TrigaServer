@@ -86,7 +86,7 @@ CONFIG readConfigFile(std::string filename)
             } else if (key == "spu_sp2") {
                 config.spu_sp2 = value.c_str();
             } else if (key == "clp") {
-                config.clp = value.c_str();
+                config.plc = value.c_str();
             } else if (key == "port_json") {
                 config.port_json = std::stoi(value);
             } else if (key == "port_raw") {
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
     CONFIG config = readConfigFile(filename);
     TrigaServer server(config.spu_sp1,
                        config.spu_sp2, 
-                       config.clp, 
+                       config.plc, 
                        config.error_interval_spu,
                        config.error_interval_plc);
     std::thread serverThread    (&TrigaServer::createServer, &server, config.port_raw, false);
@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
         std::cout << "\nMachine Side\n";
         std::cout << "SPU_A:    STATE=" << state[0] << "    PORT=" << config.spu_sp1 << "\n";
         std::cout << "SPU_B:    STATE=" << state[1] << "    PORT=" << config.spu_sp2 << "\n";
-        std::cout << "PLC:      STATE=" << state[2] << "    PORT=" << config.clp_ip << ":" <<config.clp_port << "\n";
+        std::cout << "PLC:      STATE=" << state[2] << "    PORT=" << config.plc     << "\n";
         std::cout << "\nImportante Values\n";
         std::cout << "SPU_A:    N=" << PP[0] << "\t\tT=" << PP[1] << "\n";
         std::cout << "SPU_B:    N=" << PP[2] << "\t\tT=" << PP[3] << "\n";
