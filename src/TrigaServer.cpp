@@ -29,6 +29,7 @@ TrigaServer::TrigaServer(std::string spu_sp1,//SPU_CH_A serial port
 {
     adressSpuA = spu_sp1;
     adressSpuB = spu_sp2;
+    startReadThreads();
 }
 
 
@@ -198,8 +199,12 @@ void TrigaServer::readModbusRTU(libModbusSystematomSPU& spu)
         *data_local  = spu.get_all();
         //Passar para o ponteiro inteligente global spuChA
         data_global_spuCh[adressSpu].store(data_local);
-        //Se o valor de STATE for diferente de 0 (lido com sucesso) pause a thread por 1 segundo
-        if(data_local->STATE) std::this_thread::sleep_for(std::chrono::seconds(1));
+        //Se o valor de STATE for diferente de 0 (lido com sucesso) pause a thread por 1 segundo e tente reconectar
+        if(data_local->STATE==2) 
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            spu.tryConnect();
+        }
         //OBS: A pausa TEM que ser depois de armazenar data_local no ponteiro global
         //Caso contrario o valor poderá ficar congelado no ponteiro global com STATE = 0.
     }
@@ -214,7 +219,11 @@ void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc)
     {
         *data_local = plc.get_all();
         data_global_plc.store(data_local);
-        if(data_local->STATE) std::this_thread::sleep_for(std::chrono::seconds(1));
+        if(data_local->STATE==2) //Caso o erro seja "desconexão"
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            plc.tryConnect();
+        }
     }
 }
 
