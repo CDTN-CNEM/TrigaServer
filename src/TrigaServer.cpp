@@ -240,10 +240,11 @@ void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc)
     {
         *data_local = plc.get_all();
         data_global_plc.store(data_local);
-        if(data_local->STATE==2) //Caso o erro seja "desconexão"
+        if(data_local->STATE) //Caso STATE for diferente de 0
         {
             std::this_thread::sleep_for(std::chrono::seconds(errorIntervalPLC));
-            plc.tryConnect();
+            if(data_local->STATE) //Caso o erro seja "desconexão"
+                plc.tryConnect();
         }
     }
 }
