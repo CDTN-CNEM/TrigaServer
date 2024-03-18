@@ -41,7 +41,7 @@ struct CONFIG
 {
     std::string spu_sp1   = "/dev/ttyUSB0";//SPU_CH_A serial port
     std::string spu_sp2   = "/dev/ttyUSB1";//SPU_CH_B serial port
-    std::string plc       = "192.168.0.1:4048"; //PLC IP:PORT
+    std::string plc       = "192.168.1.1:4840"; //PLC IP:PORT
     short       port_raw  = 1234; //Port of server RAW
     short       port_json = 12345; //Port of server JSON
     int         error_interval_spu = 2;//
