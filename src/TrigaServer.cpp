@@ -243,89 +243,89 @@ void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc)
         if(data_local->STATE) //Caso STATE for diferente de 0
         {
             std::this_thread::sleep_for(std::chrono::seconds(errorIntervalPLC));
-            if(data_local->STATE) //Caso o erro seja "desconexão"
+            if(data_local->STATE==2) //Caso o erro seja "desconexão"
                 plc.tryConnect();
         }
     }
 }
 
 const char * JSON_TEMPLATE = 
-    "{\n\
-        SPU_CHA: {\n\
-            READ: %d,\n\
-            N_DATA_FP: %f,\n\
-            T_DATA_FP: %f,\n\
-            F1_DATA_FP: %f,\n\
-            F2_DATA_FP: %f,\n\
-            F3_DATA_FP: %f,\n\
-            EMR_N_THRESHOLD: %f,\n\
-            WRN_N_THRESHOLD: %f,\n\
-            EMR_T_THRESHOLD: %f,\n\
-            WRN_T_THRESHOLD: %f,\n\
-            EMR_N: %d,\n\
-            WRN_N: %d,\n\
-            EMR_T: %d,\n\
-            WRN_T: %d,\n\
-            R1: %d,\n\
-            R2: %d,\n\
-            R3: %d,\n\
-            RDY: %d,\n\
-            TEST: %d,\n\
-            XXXX: %d\n\
+"   {\n\
+        \"SPU_CHA\": {\n\
+            \"STATE\":           %d,\n\
+            \"N_DATA_FP\":       %f,\n\
+            \"T_DATA_FP\":       %f,\n\
+            \"F1_DATA_FP\":      %f,\n\
+            \"F2_DATA_FP\":      %f,\n\
+            \"F3_DATA_FP\":      %f,\n\
+            \"EMR_N_THRESHOLD\": %f,\n\
+            \"WRN_N_THRESHOLD\": %f,\n\
+            \"EMR_T_THRESHOLD\": %f,\n\
+            \"WRN_T_THRESHOLD\": %f,\n\
+            \"EMR_N\":           %d,\n\
+            \"WRN_N\":           %d,\n\
+            \"EMR_T\":           %d,\n\
+            \"WRN_T\":           %d,\n\
+            \"R1\":              %d,\n\
+            \"R2\":              %d,\n\
+            \"R3\":              %d,\n\
+            \"RDY\":             %d,\n\
+            \"TEST\":            %d,\n\
+            \"XXXX\":            %d\n\
         },\n\
-        SPU_CHB: {\n\
-            READ: %d,\n\
-            N_DATA_FP: %f,\n\
-            T_DATA_FP: %f,\n\
-            F1_DATA_FP: %f,\n\
-            F2_DATA_FP: %f,\n\
-            F3_DATA_FP: %f,\n\
-            EMR_N_THRESHOLD: %f,\n\
-            WRN_N_THRESHOLD: %f,\n\
-            EMR_T_THRESHOLD: %f,\n\
-            WRN_T_THRESHOLD: %f,\n\
-            EMR_N: %d,\n\
-            WRN_N: %d,\n\
-            EMR_T: %d,\n\
-            WRN_T: %d,\n\
-            R1: %d,\n\
-            R2: %d,\n\
-            R3: %d,\n\
-            RDY: %d,\n\
-            TEST: %d,\n\
-            XXXX: %d\n\
+        \"SPU_CHB\": {\n\
+            \"STATE\":           %d,\n\
+            \"N_DATA_FP\":       %f,\n\
+            \"T_DATA_FP\":       %f,\n\
+            \"F1_DATA_FP\":      %f,\n\
+            \"F2_DATA_FP\":      %f,\n\
+            \"F3_DATA_FP\":      %f,\n\
+            \"EMR_N_THRESHOLD\": %f,\n\
+            \"WRN_N_THRESHOLD\": %f,\n\
+            \"EMR_T_THRESHOLD\": %f,\n\
+            \"WRN_T_THRESHOLD\": %f,\n\
+            \"EMR_N\":           %d,\n\
+            \"WRN_N\":           %d,\n\
+            \"EMR_T\":           %d,\n\
+            \"WRN_T\":           %d,\n\
+            \"R1\":              %d,\n\
+            \"R2\":              %d,\n\
+            \"R3\":              %d,\n\
+            \"RDY\":             %d,\n\
+            \"TEST\":            %d,\n\
+            \"XXXX\":            %d\n\
         },\n\
-        PLC: {\n\
-            STATE: %d,\n\
-            BarraReg: %f,\n\
-            BarraCon: %f,\n\
-            BarraSeg: %f,\n\
-            CLogALog: %f,\n\
-            CLogALin: %f,\n\
-            CLogAPer: %f,\n\
-            CParALin: %f,\n\
-            CParALog: %f,\n\
-            CParAPer: %f,\n\
-            CLogARea: %f,\n\
-            CLin: %f,\n\
-            CPer: %f,\n\
-            SRadAre: %f,\n\
-            SRadEntPri: %f,\n\
-            SRadPoc: %f,\n\
-            SRadRes: %f,\n\
-            SRadSaiSec: %f,\n\
-            SRadAer: %f,\n\
-            VasPri: %f,\n\
-            SPt100Poco: %f,\n\
-            SPt100EntPri: %f,\n\
-            SPt100SaiPri: %f,\n\
-            SPt100EntSec: %f,\n\
-            SPt100SaiSec: %f,\n\
-            STpPoc1: %f,\n\
-            STpPoc2: %f,\n\
-            STpLen: %f,\n\
-            SConPoc: %f,\n\
-            SConSaiPri: %f,\n\
+        \"PLC\": {\n\
+            \"STATE\":           %d,\n\
+            \"BarraReg\":        %f,\n\
+            \"BarraCon\":        %f,\n\
+            \"BarraSeg\":        %f,\n\
+            \"CLogALog\":        %f,\n\
+            \"CLogALin\":        %f,\n\
+            \"CLogAPer\":        %f,\n\
+            \"CParALin\":        %f,\n\
+            \"CParALog\":        %f,\n\
+            \"CParAPer\":        %f,\n\
+            \"CLogARea\":        %f,\n\
+            \"CLin\":            %f,\n\
+            \"CPer\":            %f,\n\
+            \"SRadAre\":         %f,\n\
+            \"SRadEntPri\":      %f,\n\
+            \"SRadPoc\":         %f,\n\
+            \"SRadRes\":         %f,\n\
+            \"SRadSaiSec\":      %f,\n\
+            \"SRadAer\":         %f,\n\
+            \"VasPri\":          %f,\n\
+            \"SPt100Poco\":      %f,\n\
+            \"SPt100EntPri\":    %f,\n\
+            \"SPt100SaiPri\":    %f,\n\
+            \"SPt100EntSec\":    %f,\n\
+            \"SPt100SaiSec\":    %f,\n\
+            \"STpPoc1\":         %f,\n\
+            \"STpPoc2\":         %f,\n\
+            \"STpLen\":          %f,\n\
+            \"SConPoc\":         %f,\n\
+            \"SConSaiPri\":      %f,\n\
         },\n\
     }\n";
 
@@ -393,7 +393,7 @@ std::string TrigaServer::genJson(ALL_DATA all_data)
             all_data.PLC.SRadRes,
             all_data.PLC.SRadSaiSec,
             all_data.PLC.SRadAer,
-            all_data.PLC.VasPri,
+            all_data.PLC.SVasPri,
             all_data.PLC.SPt100Poco,
             all_data.PLC.SPt100EntPri,
             all_data.PLC.SPt100SaiPri,

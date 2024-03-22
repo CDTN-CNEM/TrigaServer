@@ -152,11 +152,11 @@ int main(int argc, char* argv[])
     serverThread.detach();
     serverJsonThread.detach();
 
+    //Espere 3 segundo antes de abrir o monitor
+    std::this_thread::sleep_for(std::chrono::seconds(3));
     //Monitor de sistema
     while (true)
     {
-        //Espere 1 segundo antes de abrir o monitor e a cada loop
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         std::vector<int> state = server.state();
         std::vector<float> PP = server.readPP();
         system("clear");
@@ -172,9 +172,10 @@ int main(int argc, char* argv[])
         std::cout << "\nImportante Values\n";
         std::cout << "SPU_A:    N=" << PP[0] << "\t\tT=" << PP[1] << "\n";
         std::cout << "SPU_B:    N=" << PP[2] << "\t\tT=" << PP[3] << "\n";
-        std::cout << "PLC:      N=" << PP[4] << "\t\tT=" << PP[5] << "\n";
-        std::cout << "      N_log=" << PP[6] << "\n";
+        std::cout << "PLC:      N=" << PP[4] << "\t\tT=" << PP[6] << "\n";
+        std::cout << "      N_log=" << PP[5] << "\n";
         std::cout << "\n";
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     return 0;
 }
