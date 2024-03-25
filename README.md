@@ -4,8 +4,17 @@ TrigaServer is a software for GNU operating system to get the real-time values o
 
 ## Clone and compiling
 
+First you need install the requeriments. If you are using Debian distribution:
+
+``` Bash
+sudo apt install git build-essential cmake libboost-all-dev libcxxopts-dev libmodbus-dev libserialport-dev libjsoncpp-dev
+```
+
+After you can clone, build and compiling with the following commands:
+
 ``` Bash
 git clone https://github.com/SEURT-CDTN/TrigaServer.git
+cd TrigaServer
 mkdir -p build
 cd build
 cmake ..
