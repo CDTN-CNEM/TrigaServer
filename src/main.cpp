@@ -46,6 +46,7 @@ struct CONFIG
     short       port_json = 12345; //Port of server JSON
     int         error_interval_spu = 2;//
     int         error_interval_plc = 2;//
+    int         monitor_interval = 3;//
 };
 
 CONFIG readConfigFile(std::string filename)
@@ -95,7 +96,10 @@ CONFIG readConfigFile(std::string filename)
                 config.error_interval_spu = std::stoi(value);
             } else if (key == "error_interval_plc") {
                 config.error_interval_plc = std::stoi(value);
+            } else if (key == "interval_monitor") {
+                config.monitor_interval = std::stoi(value);
             }
+            
         }
     }
 
@@ -159,23 +163,27 @@ int main(int argc, char* argv[])
     {
         std::vector<int> state = server.state();
         std::vector<float> PP = server.readPP();
+        
+        std::string screen = "TrigaServer - System Monitor\n";
+                    screen += "\nClients Side\n";
+                    screen += "Server  RAW:   PORT=" + std::to_string(config.port_raw)                  + "\n";
+                    screen += "Server JSON:   PORT=" + std::to_string(config.port_json)                 + "\n";
+                    //screen += "Num. Clients:?\n";
+                    screen += "\nMachine Side\n";
+                    screen += "SPU_A:    STATE="     + std::to_string(state[0]) + "\t\tPORT=" + config.spu_sp1                   + "\n";
+                    screen += "SPU_B:    STATE="     + std::to_string(state[1]) + "\t\tPORT=" + config.spu_sp2                   + "\n";
+                    screen += "PLC:      STATE="     + std::to_string(state[2]) + "\t\tPORT=" + config.plc                       + "\n";
+                    screen += "\nImportante Values\n";
+                    screen += "SPU_A:    N="         + std::to_string(PP[0])    + "\t\tT="    + std::to_string(PP[1])            + "\n";
+                    screen += "SPU_B:    N="         + std::to_string(PP[2])    + "\t\tT="    + std::to_string(PP[3])            + "\n";
+                    screen += "PLC:      N="         + std::to_string(PP[4])    + "\t\tT="    + std::to_string(PP[6])            + "\n";
+                    screen += "      N_log="         + std::to_string(PP[5])                                     + "\n";
+                    screen += "\n";
+        
         system("clear");
-        std::cout << "TrigaServer - System Monitor\n";
-        std::cout << "\nClients Side\n";
-        std::cout << "Server JSON:  STATE=" << "?" << "    PORT=" << config.port_raw << "\n";
-        std::cout << "Server  RAW:  STATE=" << "?" << "    PORT=" << config.port_json<< "\n";
-        std::cout << "Num. Clients: " << "?" << "\n";
-        std::cout << "\nMachine Side\n";
-        std::cout << "SPU_A:    STATE=" << state[0] << "    PORT=" << config.spu_sp1 << "\n";
-        std::cout << "SPU_B:    STATE=" << state[1] << "    PORT=" << config.spu_sp2 << "\n";
-        std::cout << "PLC:      STATE=" << state[2] << "    PORT=" << config.plc     << "\n";
-        std::cout << "\nImportante Values\n";
-        std::cout << "SPU_A:    N=" << PP[0] << "\t\tT=" << PP[1] << "\n";
-        std::cout << "SPU_B:    N=" << PP[2] << "\t\tT=" << PP[3] << "\n";
-        std::cout << "PLC:      N=" << PP[4] << "\t\tT=" << PP[6] << "\n";
-        std::cout << "      N_log=" << PP[5] << "\n";
-        std::cout << "\n";
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::cout<<screen;
+        //Espere 1 segundo antes de abrir o monitor e a cada loop
+        std::this_thread::sleep_for(std::chrono::seconds(config.monitor_interval));
     }
     return 0;
 }
