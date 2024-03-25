@@ -145,13 +145,14 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
             auto data_local_spuChA = std::shared_ptr <SPU_DATA> (new SPU_DATA);
             auto data_local_spuChB = std::shared_ptr <SPU_DATA> (new SPU_DATA);
             auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
+            ALL_DATA data;
+
             while(true)
             {
                 data_local_spuChA = data_global_spuCh[0].load();
                 data_local_spuChB = data_global_spuCh[1].load();
                 data_local_plc = data_global_plc.load();
 
-                ALL_DATA data;
                 data.SPU_CHA = *data_local_spuChA;
                 data.SPU_CHB = *data_local_spuChB;
                 data.PLC    = *data_local_plc;
