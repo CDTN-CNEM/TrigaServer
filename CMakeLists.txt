@@ -20,19 +20,26 @@ pkg_search_module(jsoncpp REQUIRED IMPORTED_TARGET jsoncpp)
 FetchContent_Declare(
   libModbusSystematomSPU
   GIT_REPOSITORY https://github.com/SEURT-CDTN/libModbusSystematomSPU
-  GIT_TAG main)
+  GIT_TAG main
+  EXCLUDE_FROM_ALL)
 
 FetchContent_Declare(
   libOpcTrigaPLC
   GIT_REPOSITORY https://github.com/SEURT-CDTN/libOpcTrigaPLC
-  GIT_TAG main)
+  GIT_TAG main
+  EXCLUDE_FROM_ALL)
 
 FetchContent_Declare(
   open62541pp
   GIT_REPOSITORY https://github.com/open62541pp/open62541pp
-  GIT_TAG master)
+  GIT_TAG master
+  EXCLUDE_FROM_ALL)
 
 FetchContent_MakeAvailable(libModbusSystematomSPU libOpcTrigaPLC open62541pp)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES
+    ${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES})
 
 set(TRIGASERVER_SRC
     ${PROJECT_SOURCE_DIR}/src/main.cpp
