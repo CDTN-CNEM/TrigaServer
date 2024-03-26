@@ -159,7 +159,7 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
                 
                 std::string json = genJson(data);
 
-                if(send(clientSocket, json.c_str(), json.size(), 0)) break;
+                if(send(clientSocket, json.c_str(), json.size(), 0) == -1) break;
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(interval));
             }
@@ -190,7 +190,7 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
                     size_t size = sizeof(data);
 
                     // Send data
-                    if(send(clientSocket, buffer, size, 0)) break;
+                    if(send(clientSocket, buffer, size, 0) ==-1) break;
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(interval));
                 #endif
