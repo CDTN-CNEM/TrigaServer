@@ -37,11 +37,11 @@
     "open26541pp": {
       "flake": false,
       "locked": {
-        "lastModified": 1711299152,
-        "narHash": "sha256-917fs4FsfKEgfbxCUS7ipcNVj287y3s5t0tmauW7SXE=",
+        "lastModified": 1711487832,
+        "narHash": "sha256-E9zXyNyOTY+vJTMFlkXR97T18kHWxPPXxMYmJmyReKQ=",
         "ref": "refs/heads/master",
-        "rev": "595472a1577bf50f1c5ef21a95252331a11cf1d4",
-        "revCount": 570,
+        "rev": "93793a67ba315dc2ea4101333722fb124d1bcc8e",
+        "revCount": 573,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/open62541pp/open62541pp?submodules=true"
@@ -63,11 +63,11 @@
         "open26541pp": "open26541pp"
       },
       "locked": {
-        "lastModified": 1711469023,
-        "narHash": "sha256-D94+q74CBzq3ObRdHFUEYEaCXpntAPjk6pez9TW/Lp4=",
+        "lastModified": 1711493679,
+        "narHash": "sha256-xMZaLPpHf4zsb0RL3HoUmd2AUkGSOzbXpR6fy/nJ310=",
         "owner": "SEURT-CDTN",
         "repo": "libOpcTrigaPLC",
-        "rev": "72913d5150112c706bb4b8949754ea78f27e2b42",
+        "rev": "637f7d4bf660a340465d74f44093ebfff776cf80",
         "type": "github"
       },
       "original": {
@@ -94,11 +94,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1711464701,
-        "narHash": "sha256-3NUPIkDEtrxrtaj12irgoQ4jZ+FK+9ufNqATAjq8OCo=",
+        "lastModified": 1711493652,
+        "narHash": "sha256-L7Niy8GSeRP38EkzfQBzbOP/IcCwel3LLH7zj42cv4M=",
         "owner": "SEURT-CDTN",
         "repo": "libModbusSystematomSPU",
-        "rev": "549e0999641cbba55bdec3ecb047b0b7d1fdb849",
+        "rev": "d5cfa4c86a130a179c26a4d76395c6dec276a25e",
         "type": "github"
       },
       "original": {

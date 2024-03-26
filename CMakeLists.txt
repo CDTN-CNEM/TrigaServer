@@ -11,7 +11,6 @@ find_package(PkgConfig REQUIRED)
 find_package(Boost 1.81 REQUIRED COMPONENTS system)
 
 pkg_search_module(SYSTEMD "systemd")
-
 pkg_search_module(cxxopts REQUIRED IMPORTED_TARGET cxxopts)
 pkg_search_module(Modbus REQUIRED IMPORTED_TARGET libmodbus)
 pkg_search_module(SerialPort REQUIRED IMPORTED_TARGET libserialport)
@@ -26,6 +25,8 @@ if(NOT LibModbusSystematomSPU_FOUND)
     GIT_TAG main
     EXCLUDE_FROM_ALL)
   FetchContent_MakeAvailable(LibModbusSystematomSPU)
+else()
+  set(opcTrigaPLC "")
 endif()
 
 find_package(LibOpcTrigaPLC QUIET)
@@ -37,6 +38,8 @@ if(NOT LibOpcTrigaPLC_FOUND)
     GIT_TAG main
     EXCLUDE_FROM_ALL)
   FetchContent_MakeAvailable(LibOpcTrigaPLC)
+else()
+  set(libOpcTrigaPLC "")
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -50,20 +53,16 @@ add_executable(trigaserver ${TRIGASERVER_SRC})
 
 target_include_directories(
   trigaserver
-  PRIVATE ${PROJECT_SOURCE_DIR}/include
-          ${Boost_INCLUDE_DIRS}
-          ${CXXOPTS_INCLUDE_DIRS}
-          ${SERIALPORT_INCLUDE_DIRS}
-          ${JSONCPP_INCLUDE_DIRS}
-          ${MODBUS_INCLUDE_DIRS}
-          ${LibOpcTrigaPLC_INCLUDE_DIRS}
-          ${LibModbusSystematomSPU_INCLUDE_DIRS})
+  PRIVATE ${PROJECT_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS}
+          ${LibOpcTrigaPLC_INCLUDE_DIRS} ${LibModbusSystematomSPU_INCLUDE_DIRS})
 
 target_link_libraries(
   trigaserver
   PRIVATE ${Boost_LIBRARIES}
           ${LibOpcTrigaPLC_LIBRARIES}
           ${LibModbusSystematomSPU_LIBRARIES}
+          opcTrigaPLC
+          modbusSystematomSPU
           PkgConfig::cxxopts
           PkgConfig::Modbus
           PkgConfig::SerialPort
