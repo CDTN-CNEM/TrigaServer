@@ -180,7 +180,6 @@ int main(int argc, char* argv[])
                     screen += "      N_log="         + std::to_string(PP[5])                                     + "\n";
                     screen += "\n";
         
-        system("clear");
         std::cout<<screen;
         //Espere 1 segundo antes de abrir o monitor e a cada loop
         std::this_thread::sleep_for(std::chrono::seconds(config.monitor_interval));

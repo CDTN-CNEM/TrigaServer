@@ -42,4 +42,6 @@ TrigaServer
 .vscode*
 
 # Pasta de compilação
-build/
+build
+result
+.cache

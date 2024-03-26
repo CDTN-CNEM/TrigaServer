@@ -1,37 +1,37 @@
 {
-  description = "TrigaServer";
+  description = "Get the real-time values of the Nuclear Reator Triga IPR-R1 and share in network.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-
-    spu.url = "github:SEURT-CDTN/libModbusSystematomSPU";
-    spu.flake = false;
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     plc.url = "github:SEURT-CDTN/libOpcTrigaPLC";
-    plc.flake = false;
+    plc.inputs.nixpkgs.follows = "nixpkgs";
+    plc.inputs.flake-utils.follows = "flake-utils";
 
-    open26541pp.url = "https://github.com/open62541pp/open62541pp?submodules=true";
-    open26541pp.flake = false;
-    open26541pp.type = "git";
-    open26541pp.submodules = true;
+    spu.url = "github:SEURT-CDTN/libModbusSystematomSPU";
+    spu.inputs.nixpkgs.follows = "nixpkgs";
+    spu.inputs.flake-utils.follows = "flake-utils";
   };
 
-  outputs = { nixpkgs, flake-utils, spu, plc, open26541pp, ... }:
+  outputs = { nixpkgs, flake-utils, spu, plc, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
+        plc-pkg = plc.packages.${system}.default;
+        spu-pkg = spu.packages.${system}.default;
         buildInputs = with pkgs; [
           boost
           cxxopts
           jsoncpp
           libmodbus
           libserialport
+          plc-pkg
+          spu-pkg
         ];
         nativeBuildInputs = with pkgs; [
           cmake
           pkg-config
-          python3
           stdenv
         ];
       in
@@ -51,9 +51,7 @@
           src = ./.;
           cmakeFlags = [
             "-DDONT_INSTALL_CONF=1"
-            "-DFETCHCONTENT_SOURCE_DIR_LIBMODBUSSYSTEMATOMSPU=${spu}"
-            "-DFETCHCONTENT_SOURCE_DIR_LIBOPCTRIGAPLC=${plc}"
-            "-DFETCHCONTENT_SOURCE_DIR_OPEN62541PP=${open26541pp}"
+            "-DCMAKE_MODULE_PATH=${plc-pkg}/lib/cmake/LibOpcTrigaPLC;${spu-pkg}/lib/cmake/LibModbusSystematomSPU"
           ];
           inherit nativeBuildInputs;
           inherit buildInputs;
