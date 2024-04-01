@@ -316,7 +316,7 @@ const char * JSON_TEMPLATE =
             \"SRadRes\":         %f,\n\
             \"SRadSaiSec\":      %f,\n\
             \"SRadAer\":         %f,\n\
-            \"VasPri\":          %f,\n\
+            \"SVasPri\":         %f,\n\
             \"SPt100Poco\":      %f,\n\
             \"SPt100EntPri\":    %f,\n\
             \"SPt100SaiPri\":    %f,\n\
