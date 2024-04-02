@@ -95,7 +95,7 @@ class TrigaServer
         std::string genJson(ALL_DATA all_data);
 
         //Função para converter time_point em struct int_TIME (usando pelo genJson)
-        int_TIME decodeTime(std::chrono::system_clock::time_point t)
+        int_TIME decodeTime(std::chrono::system_clock::time_point t);
 
         //Função que lida com os clientes (recebe o valor de intervalo e cria uma thread para cada cliente)
         void handleTCPClients(int clientSocket, bool sendJson);
