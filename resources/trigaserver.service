@@ -3,7 +3,7 @@ Description=TrigaServer
 After=network.target
 
 [Service]
-ExecStart=${CMAKE_INSTALL_BIN}/bin/TrigaServer
+ExecStart=${CMAKE_INSTALL_BIN}/usr/local/bin/trigaserver
 Restart=always
 User=trigaserver
 
