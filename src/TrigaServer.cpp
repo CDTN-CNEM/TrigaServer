@@ -244,10 +244,10 @@ float convLin(float x, float x1, float x2, float y1, float y2)
 PLC_DATA convPLC(PLC_DATA plcOrig)
 {
     PLC_DATA plcConv = plcOrig;
-    plcConv.BarraReg = convLin(plcOrig.BarraReg, 260, 1581, 150, 902);
+    plcConv.BarraReg = convLin(plcOrig.BarraReg, 260, 1581, 150, 902);//Converter bits para "posições de barra"
     plcConv.BarraCon = convLin(plcOrig.BarraCon, 312, 1739, 162, 900);
     plcConv.BarraSeg = convLin(plcOrig.BarraSeg, 301, 1592, 172, 901);
-    plcConv.CLogALin = convLin(plcOrig.CLogALin, 500, 8192,   1, 250);
+    plcConv.CLogALin = convLin(plcOrig.CLogALin, 838, 4000,  10, 100);//Converter bits para kW
     //plcConv.CLogALog = plcOrig.CLogALog;
     //plcConv.CLogAPer = plcOrig.CLogAPer;
     //plcConv.CParALin = plcOrig.CParALin;
