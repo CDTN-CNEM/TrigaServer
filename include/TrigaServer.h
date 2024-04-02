@@ -42,6 +42,17 @@ struct ALL_DATA
     SPU_DATA SPU_CHB;
 };
 
+struct int_TIME
+{
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minute;
+    int second;
+    int millisecond;
+};
+
 class TrigaServer
 {
     public:
@@ -82,6 +93,9 @@ class TrigaServer
 
         // Função para gerar string JSON com todos os dados
         std::string genJson(ALL_DATA all_data);
+
+        //Função para converter time_point em struct int_TIME (usando pelo genJson)
+        int_TIME decodeTime(std::chrono::system_clock::time_point t)
 
         //Função que lida com os clientes (recebe o valor de intervalo e cria uma thread para cada cliente)
         void handleTCPClients(int clientSocket, bool sendJson);

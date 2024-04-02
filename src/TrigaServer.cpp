@@ -299,6 +299,15 @@ const char * JSON_TEMPLATE =
 "   {\n\
         \"SPU_CHA\": {\n\
             \"STATE\":           %d,\n\
+            \"TIME\":{\n\
+                \"Y\":           %d,\n\
+                \"Mo\":          %d,\n\
+                \"D\":           %d,\n\
+                \"H\":           %d,\n\
+                \"Mi\":          %d,\n\
+                \"S\":           %d,\n\
+                \"MS\":          %d,\n\
+            },\n\
             \"N_DATA_FP\":       %f,\n\
             \"T_DATA_FP\":       %f,\n\
             \"F1_DATA_FP\":      %f,\n\
@@ -321,6 +330,15 @@ const char * JSON_TEMPLATE =
         },\n\
         \"SPU_CHB\": {\n\
             \"STATE\":           %d,\n\
+            \"TIME\":{\n\
+                \"Y\":           %d,\n\
+                \"Mo\":          %d,\n\
+                \"D\":           %d,\n\
+                \"H\":           %d,\n\
+                \"Mi\":          %d,\n\
+                \"S\":           %d,\n\
+                \"MS\":          %d,\n\
+            },\n\
             \"N_DATA_FP\":       %f,\n\
             \"T_DATA_FP\":       %f,\n\
             \"F1_DATA_FP\":      %f,\n\
@@ -343,6 +361,15 @@ const char * JSON_TEMPLATE =
         },\n\
         \"PLC\": {\n\
             \"STATE\":           %d,\n\
+            \"TIME\":{\n\
+                \"Y\":           %d,\n\
+                \"Mo\":          %d,\n\
+                \"D\":           %d,\n\
+                \"H\":           %d,\n\
+                \"Mi\":          %d,\n\
+                \"S\":           %d,\n\
+                \"MS\":          %d,\n\
+            },\n\
             \"BarraReg\":        %f,\n\
             \"BarraCon\":        %f,\n\
             \"BarraSeg\":        %f,\n\
@@ -375,10 +402,39 @@ const char * JSON_TEMPLATE =
         },\n\
     }\n";
 
+int_TIME TrigaServer::decodeTime(std::chrono::system_clock::time_point t)
+{
+    auto now = std::chrono::system_clock::to_time_t(t);
+    std::tm tm_local = *std::localtime(&now);
+
+    int_TIME time;
+    time.year = tm_local.tm_year + 1900; // Ano: tm_year é anos desde 1900
+    time.month = tm_local.tm_mon + 1; // Mês: tm_mon é 0-based
+    time.day = tm_local.tm_mday; // Dia do mês
+    time.hour = tm_local.tm_hour; // Hora
+    time.minute = tm_local.tm_min; // Minuto
+    time.second = tm_local.tm_sec; // Segundo
+
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(t.time_since_epoch()).count();
+    time.millisecond = ms % 1000;
+    return time;
+}
+
 std::string TrigaServer::genJson(ALL_DATA all_data) 
 {
+    int_TIME SPU_CHA_TIME = decodeTime(all_data.SPU_CHA.TIME);
+    int_TIME SPU_CHB_TIME = decodeTime(all_data.SPU_CHB.TIME);
+    int_TIME PLC_TIME     = decodeTime(all_data.PLC.TIME);
+
     char buffer[4096];
     sprintf(buffer, JSON_TEMPLATE, all_data.SPU_CHA.STATE,
+            SPU_CHA_TIME.year,
+            SPU_CHA_TIME.month,
+            SPU_CHA_TIME.day,
+            SPU_CHA_TIME.hour,
+            SPU_CHA_TIME.minute,
+            SPU_CHA_TIME.second,
+            SPU_CHA_TIME.millisecond,
             all_data.SPU_CHA.N_DATA_FP,
             all_data.SPU_CHA.T_DATA_FP,
             all_data.SPU_CHA.F1_DATA_FP,
@@ -400,6 +456,13 @@ std::string TrigaServer::genJson(ALL_DATA all_data)
             all_data.SPU_CHA.XXXX,
 
             all_data.SPU_CHB.STATE,
+            SPU_CHB_TIME.year,
+            SPU_CHB_TIME.month,
+            SPU_CHB_TIME.day,
+            SPU_CHB_TIME.hour,
+            SPU_CHB_TIME.minute,
+            SPU_CHB_TIME.second,
+            SPU_CHB_TIME.millisecond,
             all_data.SPU_CHB.N_DATA_FP,
             all_data.SPU_CHB.T_DATA_FP,
             all_data.SPU_CHB.F1_DATA_FP,
@@ -421,6 +484,13 @@ std::string TrigaServer::genJson(ALL_DATA all_data)
             all_data.SPU_CHB.XXXX,
             
             all_data.PLC.STATE,
+            PLC_TIME.year,
+            PLC_TIME.month,
+            PLC_TIME.day,
+            PLC_TIME.hour,
+            PLC_TIME.minute,
+            PLC_TIME.second,
+            PLC_TIME.millisecond,
             all_data.PLC.BarraReg,
             all_data.PLC.BarraCon,
             all_data.PLC.BarraSeg,
