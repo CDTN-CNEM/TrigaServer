@@ -232,51 +232,6 @@ void TrigaServer::readModbusRTU(libModbusSystematomSPU& spu)
     }
 }
 
-//Função para converter o valor de x através de 2 pontos conhecidos. 
-float convLin(float x, float x1, float x2, float y1, float y2)
-{
-    float a =       (y2-y1) / (x2-x1);
-    float b = (y1*x2-y2*x1) / (x2-x1);
-    return a*x+b;
-}
-
-//Função para converter os dados brutos do PLC
-PLC_DATA convPLC(PLC_DATA plcOrig)
-{
-    PLC_DATA plcConv = plcOrig;
-    plcConv.BarraReg = convLin(plcOrig.BarraReg, 260, 1581, 150, 902);//Converter bits para "posições de barra"
-    plcConv.BarraCon = convLin(plcOrig.BarraCon, 312, 1739, 162, 900);
-    plcConv.BarraSeg = convLin(plcOrig.BarraSeg, 301, 1592, 172, 901);
-    plcConv.CLogALin = convLin(plcOrig.CLogALin, 838, 4000,  10, 100);//Converter bits para kW
-    //plcConv.CLogALog = plcOrig.CLogALog;
-    //plcConv.CLogAPer = plcOrig.CLogAPer;
-    //plcConv.CParALin = plcOrig.CParALin;
-    //plcConv.CParALog = plcOrig.CParALog;
-    //plcConv.CParAPer = plcOrig.CParAPer;
-    //plcConv.CLogARea = plcOrig.CLogARea;
-    //plcConv.CLin = plcOrig.CLin;
-    //plcConv.CLinScale = plcOrig.CLinScale;
-    //plcConv.CPer = plcOrig.CPer;
-    //plcConv.SRadAre = plcOrig.SRadAre;
-    //plcConv.SRadEntPri = plcOrig.SRadEntPri;
-    //plcConv.SRadPoc = plcOrig.SRadPoc;
-    //plcConv.SRadRes = plcOrig.SRadRes;
-    //plcConv.SRadSaiSec = plcOrig.SRadSaiSec;
-    //plcConv.SRadAer = plcOrig.SRadAer;
-    //plcConv.SVasPri = plcOrig.SVasPri;
-    //plcConv.SPt100Poco = plcOrig.SPt100Poco;
-    //plcConv.SPt100EntPri = plcOrig.SPt100EntPri;
-    //plcConv.SPt100SaiPri = plcOrig.SPt100SaiPri;
-    //plcConv.SPt100EntSec = plcOrig.SPt100EntSec;
-    //plcConv.SPt100SaiSec = plcOrig.SPt100SaiSec;
-    //plcConv.STpPoc1 = plcOrig.STpPoc1;
-    //plcConv.STpPoc2 = plcOrig.STpPoc2;
-    //plcConv.STpLen = plcOrig.STpLen;
-    //plcConv.SConPoc = plcOrig.SConPoc;
-    //plcConv.SConSaiPri = plcOrig.SConSaiPri;
-    return plcConv;
-}
-
 // Ler dados Modbus do PLC usando libModbusSiemensPLC
 void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc) 
 {
