@@ -2,7 +2,12 @@ cmake_minimum_required(VERSION 3.14)
 
 include(FetchContent)
 
-project(TrigaServer)
+project(
+  TrigaServer
+  VERSION 0.0.1
+  DESCRIPTION "Get the real-time values of the Nuclear Reator Triga IPR-R1 and share in network."
+  HOMEPAGE_URL "https://github.com/SEURT-CDTN/TrigaServer"
+  LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 cmake_policy(SET CMP0079 NEW)
