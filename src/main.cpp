@@ -41,7 +41,8 @@ struct CONFIG
 {
     std::string spu_sp1   = "/dev/ttyUSB0";//SPU_CH_A serial port
     std::string spu_sp2   = "/dev/ttyUSB1";//SPU_CH_B serial port
-    std::string plc       = "192.168.1.1:4840"; //PLC IP:PORT
+    std::string plc_adress = "192.168.1.1:4840"; //PLC IP:PORT
+    std::string plc_conv_file = "/etc/libOpcTrigaPLC.conf"; //Path to PLCconversion file
     short       port_raw  = 1234; //Port of server RAW
     short       port_json = 12345; //Port of server JSON
     int         error_interval_spu = 2;//
@@ -82,24 +83,15 @@ CONFIG readConfigFile(std::string filename)
             value.erase(0, value.find_first_not_of(" \t"));
             value.erase(value.find_last_not_of(" \t") + 1);
 
-            if        (key == "spu_sp1") {
-                config.spu_sp1 = value.c_str();
-            } else if (key == "spu_sp2") {
-                config.spu_sp2 = value.c_str();
-            } else if (key == "clp") {
-                config.plc = value.c_str();
-            } else if (key == "port_json") {
-                config.port_json = std::stoi(value);
-            } else if (key == "port_raw") {
-                config.port_raw = std::stoi(value);
-            } else if (key == "error_interval_spu") {
-                config.error_interval_spu = std::stoi(value);
-            } else if (key == "error_interval_plc") {
-                config.error_interval_plc = std::stoi(value);
-            } else if (key == "interval_monitor") {
-                config.monitor_interval = std::stoi(value);
-            }
-            
+            if      (key == "spu_sp1")            config.spu_sp1 = value.c_str();
+            else if (key == "spu_sp2")            config.spu_sp2 = value.c_str();
+            else if (key == "clp_adress")         config.plc_adress = value.c_str();
+            else if (key == "plc_conv_file")      config.plc_conv_file = value.c_str();
+            else if (key == "port_json")          config.port_json = std::stoi(value);
+            else if (key == "port_raw")           config.port_raw = std::stoi(value);
+            else if (key == "error_interval_spu") config.error_interval_spu = std::stoi(value);
+            else if (key == "error_interval_plc") config.error_interval_plc = std::stoi(value);
+            else if (key == "interval_monitor")   config.monitor_interval = std::stoi(value);            
         }
     }
 
@@ -146,8 +138,9 @@ int main(int argc, char* argv[])
 
     CONFIG config = readConfigFile(filename);
     TrigaServer server(config.spu_sp1,
-                       config.spu_sp2, 
-                       config.plc, 
+                       config.spu_sp2,
+                       config.plc_adress,
+                       config.plc_conv_file,
                        config.error_interval_spu,
                        config.error_interval_plc);
     std::thread serverThread    (&TrigaServer::createServer, &server, config.port_raw, false);
@@ -172,7 +165,7 @@ int main(int argc, char* argv[])
                     screen += "\nMachine Side\n";
                     screen += "SPU_A:    STATE="     + std::to_string(state[0]) + "\t\tPORT=" + config.spu_sp1                   + "\n";
                     screen += "SPU_B:    STATE="     + std::to_string(state[1]) + "\t\tPORT=" + config.spu_sp2                   + "\n";
-                    screen += "PLC:      STATE="     + std::to_string(state[2]) + "\t\tPORT=" + config.plc                       + "\n";
+                    screen += "PLC:      STATE="     + std::to_string(state[2]) + "\t\tPORT=" + config.plc_adress                       + "\n";
                     screen += "\nImportante Values\n";
                     screen += "SPU_A:    N="         + std::to_string(PP[0])    + "\t\tT="    + std::to_string(PP[1])            + "\n";
                     screen += "SPU_B:    N="         + std::to_string(PP[2])    + "\t\tT="    + std::to_string(PP[3])            + "\n";

@@ -58,7 +58,8 @@ class TrigaServer
     public:
         TrigaServer(std::string spu_sp1, 
                     std::string spu_sp2, 
-                    std::string clp, 
+                    std::string clp_adress, 
+                    std::string clp_conv_file, 
                     int error_interval_plc,
                     int error_interval_spu);
         ~TrigaServer();

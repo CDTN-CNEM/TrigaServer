@@ -21,12 +21,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 TrigaServer::TrigaServer(std::string spu_sp1,//SPU_CH_A serial port
                          std::string spu_sp2,//SPU_CH_B serial port
-                         std::string clp, //CLP IP
+                         std::string clp_adress, //CLP IP
+                         std::string clp_conv_file,
                          int error_interval_plc,
                          int error_interval_spu) //CPL Port
                         :spuChA(spu_sp1),
                          spuChB(spu_sp2),
-                         plc(clp)
+                         plc(clp_adress,clp_conv_file)
 {
     adressSpuA = spu_sp1;
     adressSpuB = spu_sp2;
@@ -239,7 +240,7 @@ void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc)
     auto data_local = std::shared_ptr <PLC_DATA> (new PLC_DATA);
     while (true)
     {
-        *data_local = plc.get_all();
+        *data_local = plc.get_all_conv();
         data_global_plc.store(data_local);
         if(data_local->STATE) //Caso STATE for diferente de 0
         {
