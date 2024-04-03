@@ -39,8 +39,8 @@ void showLicense()
 
 struct CONFIG
 {
-    std::string spu_sp1   = "/dev/ttyUSB0";//SPU_CH_A serial port
-    std::string spu_sp2   = "/dev/ttyUSB1";//SPU_CH_B serial port
+    std::string spu_sp1   = "/dev/modbus/spuChA";//SPU_CH_A serial port
+    std::string spu_sp2   = "/dev/modbus/spuChB";//SPU_CH_B serial port
     std::string plc_adress = "192.168.1.1:4840"; //PLC IP:PORT
     std::string plc_conv_file = "/etc/libOpcTrigaPLC.conf"; //Path to PLCconversion file
     short       port_raw  = 1234; //Port of server RAW
