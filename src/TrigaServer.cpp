@@ -424,8 +424,8 @@ std::string TrigaServer::genJson(ALL_DATA all_data)
     int_TIME PLC_TIME     = decodeTime(all_data.PLC.TIME);
     PLC_DATA plc_conv     = plc.convAllData(all_data.PLC, plc.fatorConv);;
 
-    char buffer[4096];
     sprintf(buffer, JSON_TEMPLATE, all_data.SPU_CHA.STATE,
+    char buffer[8192];
             SPU_CHA_TIME.year,
             SPU_CHA_TIME.month,
             SPU_CHA_TIME.day,
