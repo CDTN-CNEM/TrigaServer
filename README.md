@@ -1,15 +1,26 @@
 # TrigaServer
 
-TrigaServer is a software for GNU operating system to get the real-time values of the Nuclear Reator
+TrigaServer is a software for GNU operating system to get the real-time values of the Nuclear Reactor
 Triga IPR-R1 and share in network.
 
-## Clone and compiling
+## Compiling manually
 
-First you need to install the dependencies. If you are using a Debian-based distribution, run:
+### Installing dependencies
+
+If you are using a Debian-based distribution, run:
 
 ``` Bash
 sudo apt install git build-essential cmake libboost-all-dev libcxxopts-dev libmodbus-dev libserialport-dev libjsoncpp-dev
 ```
+
+If you are using a Arch-based distribution, run:
+
+``` Bash
+sudo pacman -Syu git base-devel cmake boost cxxopts libserialport
+paru -S libmodbus #AUR
+```
+
+### Clone and compiling
 
 Afterwards, you can clone, build and compile with the following commands:
 
@@ -20,6 +31,18 @@ mkdir build
 cd build
 cmake ..
 make
+```
+
+## Auto-Compiling and build a PKG
+
+If you are using a Arch-based distribution, run:
+
+``` Bash
+paru -S libmodbus #AUR
+mkdir -p ~/TrigaServer-PKG
+cd ~/TrigaServer-PKG
+wget https://raw.githubusercontent.com/SEURT-CDTN/InstallGNU/ArchLinux/TrigaServer/PKGBUILD
+makepkg -s #Or use -si to install when finish the build.
 ```
 
 ## License, Warranty and Copyright
