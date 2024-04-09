@@ -315,7 +315,48 @@ const char * JSON_TEMPLATE =
             \"TEST\":            %d,\n\
             \"XXXX\":            %d\n\
         },\n\
-        \"PLC\": {\n\
+        \"PLC_ORIG\": {\n\
+            \"STATE\":           %d,\n\
+            \"TIME\":{\n\
+                \"Y\":           %d,\n\
+                \"Mo\":          %d,\n\
+                \"D\":           %d,\n\
+                \"H\":           %d,\n\
+                \"Mi\":          %d,\n\
+                \"S\":           %d,\n\
+                \"MS\":          %d,\n\
+            },\n\
+            \"BarraReg\":        %d,\n\
+            \"BarraCon\":        %d,\n\
+            \"BarraSeg\":        %d,\n\
+            \"CLogALog\":        %d,\n\
+            \"CLogALin\":        %d,\n\
+            \"CLogAPer\":        %d,\n\
+            \"CParALin\":        %d,\n\
+            \"CParALog\":        %d,\n\
+            \"CParAPer\":        %d,\n\
+            \"CLogARea\":        %d,\n\
+            \"CLin\":            %d,\n\
+            \"CPer\":            %d,\n\
+            \"SRadAre\":         %d,\n\
+            \"SRadEntPri\":      %d,\n\
+            \"SRadPoc\":         %d,\n\
+            \"SRadRes\":         %d,\n\
+            \"SRadSaiSec\":      %d,\n\
+            \"SRadAer\":         %d,\n\
+            \"SVasPri\":         %d,\n\
+            \"SPt100Poco\":      %d,\n\
+            \"SPt100EntPri\":    %d,\n\
+            \"SPt100SaiPri\":    %d,\n\
+            \"SPt100EntSec\":    %d,\n\
+            \"SPt100SaiSec\":    %d,\n\
+            \"STpPoc1\":         %d,\n\
+            \"STpPoc2\":         %d,\n\
+            \"STpLen\":          %d,\n\
+            \"SConPoc\":         %d,\n\
+            \"SConSaiPri\":      %d,\n\
+        },\n\
+        \"PLC_CONV\": {\n\
             \"STATE\":           %d,\n\
             \"TIME\":{\n\
                 \"Y\":           %d,\n\
@@ -381,6 +422,7 @@ std::string TrigaServer::genJson(ALL_DATA all_data)
     int_TIME SPU_CHA_TIME = decodeTime(all_data.SPU_CHA.TIME);
     int_TIME SPU_CHB_TIME = decodeTime(all_data.SPU_CHB.TIME);
     int_TIME PLC_TIME     = decodeTime(all_data.PLC.TIME);
+    PLC_DATA plc_conv     = plc.convAllData(all_data.PLC, plc.fatorConv);;
 
     char buffer[4096];
     sprintf(buffer, JSON_TEMPLATE, all_data.SPU_CHA.STATE,
@@ -475,7 +517,45 @@ std::string TrigaServer::genJson(ALL_DATA all_data)
             all_data.PLC.STpPoc2,
             all_data.PLC.STpLen,
             all_data.PLC.SConPoc,
-            all_data.PLC.SConSaiPri
+            all_data.PLC.SConSaiPri,
+
+            plc_conv.STATE,
+            PLC_TIME.year,
+            PLC_TIME.month,
+            PLC_TIME.day,
+            PLC_TIME.hour,
+            PLC_TIME.minute,
+            PLC_TIME.second,
+            PLC_TIME.millisecond,
+            plc_conv.BarraReg,
+            plc_conv.BarraCon,
+            plc_conv.BarraSeg,
+            plc_conv.CLogALog,
+            plc_conv.CLogALin,
+            plc_conv.CLogAPer,
+            plc_conv.CParALin,
+            plc_conv.CParALog,
+            plc_conv.CParAPer,
+            plc_conv.CLogARea,
+            plc_conv.CLin,
+            plc_conv.CPer,
+            plc_conv.SRadAre,
+            plc_conv.SRadEntPri,
+            plc_conv.SRadPoc,
+            plc_conv.SRadRes,
+            plc_conv.SRadSaiSec,
+            plc_conv.SRadAer,
+            plc_conv.SVasPri,
+            plc_conv.SPt100Poco,
+            plc_conv.SPt100EntPri,
+            plc_conv.SPt100SaiPri,
+            plc_conv.SPt100EntSec,
+            plc_conv.SPt100SaiSec,
+            plc_conv.STpPoc1,
+            plc_conv.STpPoc2,
+            plc_conv.STpLen,
+            plc_conv.SConPoc,
+            plc_conv.SConSaiPri
             );
     return buffer;
 }
