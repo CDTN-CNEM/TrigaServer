@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <fstream>
 #include <string>
 #include <chrono>
+#include <csignal>
 
 void showVersion()
 {
@@ -103,6 +104,7 @@ CONFIG readConfigFile(std::string filename)
 
 int main(int argc, char* argv[])
 {
+    signal(SIGPIPE, SIG_IGN);
     std::string filename = "/etc/trigaserver.conf";
     cxxopts::Options options("TrigaServer","TrigaServer is a software for GNU operating system to get the real-time values of the Nuclear Reator Triga IPR-R1 and share in network.");
     bool monitor_stdout_arg = 0;
