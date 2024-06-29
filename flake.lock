@@ -20,11 +20,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1711370797,
-        "narHash": "sha256-2xu0jVSjuKhN97dqc4bVtvEH52Rwh6+uyI1XCnzoUyI=",
+        "lastModified": 1719468428,
+        "narHash": "sha256-vN5xJAZ4UGREEglh3lfbbkIj+MPEYMuqewMn4atZFaQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c726225724e681b3626acc941c6f95d2b0602087",
+        "rev": "1e3deb3d8a86a870d925760db1a5adecc64d329d",
         "type": "github"
       },
       "original": {
@@ -37,11 +37,11 @@
     "open26541pp": {
       "flake": false,
       "locked": {
-        "lastModified": 1711487832,
-        "narHash": "sha256-E9zXyNyOTY+vJTMFlkXR97T18kHWxPPXxMYmJmyReKQ=",
+        "lastModified": 1717110685,
+        "narHash": "sha256-Cl+iSK7MAAvMlGyv0DOWqJr48QgE86QbUfgdzn4EDJ0=",
         "ref": "refs/heads/master",
-        "rev": "93793a67ba315dc2ea4101333722fb124d1bcc8e",
-        "revCount": 573,
+        "rev": "55952a99b2da9132ec73a5afd2e578f48f6f1585",
+        "revCount": 600,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/open62541pp/open62541pp?submodules=true"
@@ -63,11 +63,11 @@
         "open26541pp": "open26541pp"
       },
       "locked": {
-        "lastModified": 1711493679,
-        "narHash": "sha256-xMZaLPpHf4zsb0RL3HoUmd2AUkGSOzbXpR6fy/nJ310=",
+        "lastModified": 1719677611,
+        "narHash": "sha256-2PQGLfLzR+j7hHLweSPk0JhKbp67IBsq0GMOk8W+cWI=",
         "owner": "SEURT-CDTN",
         "repo": "libOpcTrigaPLC",
-        "rev": "637f7d4bf660a340465d74f44093ebfff776cf80",
+        "rev": "852883ee0ad9c3f4613080bc83cf7acad5a85c6c",
         "type": "github"
       },
       "original": {
@@ -94,11 +94,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1711493652,
-        "narHash": "sha256-L7Niy8GSeRP38EkzfQBzbOP/IcCwel3LLH7zj42cv4M=",
+        "lastModified": 1719676983,
+        "narHash": "sha256-jWboKFTBAeOuBbf6fN7jwuI/MwE/qzkcqbfI6dkdM9w=",
         "owner": "SEURT-CDTN",
         "repo": "libModbusSystematomSPU",
-        "rev": "d5cfa4c86a130a179c26a4d76395c6dec276a25e",
+        "rev": "e30b2436ee512ee487eaec2303768f089824a5ec",
         "type": "github"
       },
       "original": {
