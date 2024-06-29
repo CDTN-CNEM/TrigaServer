@@ -19,6 +19,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //TrigaServer.cpp
 #include "TrigaServer.h"
 
+const char CSV_HEADER[] = 
+"SPU_CHA_STATE;SPU_CHA_TIME_Y;SPU_CHA_TIME_Mo;SPU_CHA_TIME_D;SPU_CHA_TIME_H;SPU_CHA_TIME_Mi;SPU_CHA_TIME_S;SPU_CHA_TIME_MS;SPU_CHA_N_DATA_FP;SPU_CHA_T_DATA_FP;SPU_CHA_F1_DATA_FP;SPU_CHA_F2_DATA_FP;SPU_CHA_F3_DATA_FP;SPU_CHA_EMR_N_THRESHOLD;SPU_CHA_WRN_N_THRESHOLD;SPU_CHA_EMR_T_THRESHOLD;SPU_CHA_WRN_T_THRESHOLD;SPU_CHA_EMR_N;SPU_CHA_WRN_N;SPU_CHA_EMR_T;SPU_CHA_WRN_T;SPU_CHA_R1;SPU_CHA_R2;SPU_CHA_R3;SPU_CHA_RDY;SPU_CHA_TEST;SPU_CHA_XXXX;;SPU_CHB_STATE;SPU_CHB_TIME_Y;SPU_CHB_TIME_Mo;SPU_CHB_TIME_D;SPU_CHB_TIME_H;SPU_CHB_TIME_Mi;SPU_CHB_TIME_S;SPU_CHB_TIME_MS;SPU_CHB_N_DATA_FP;SPU_CHB_T_DATA_FP;SPU_CHB_F1_DATA_FP;SPU_CHB_F2_DATA_FP;SPU_CHB_F3_DATA_FP;SPU_CHB_EMR_N_THRESHOLD;SPU_CHB_WRN_N_THRESHOLD;SPU_CHB_EMR_T_THRESHOLD;SPU_CHB_WRN_T_THRESHOLD;SPU_CHB_EMR_N;SPU_CHB_WRN_N;SPU_CHB_EMR_T;SPU_CHB_WRN_T;SPU_CHB_R1;SPU_CHB_R2;SPU_CHB_R3;SPU_CHB_RDY;SPU_CHB_TEST;SPU_CHB_XXXX;;;PLC_ORIG_STATE;PLC_ORIG_TIME;PLC_ORIG_TIME_Mo;PLC_ORIG_TIME_D;PLC_ORIG_TIME_H;PLC_ORIG_TIME_Mi;PLC_ORIG_TIME_S;PLC_ORIG_TIME_MS;PLC_ORIG_BarraReg;PLC_ORIG_BarraCon;PLC_ORIG_BarraSeg;PLC_ORIG_CLogALog;PLC_ORIG_CLogALin;PLC_ORIG_CLogAPer;PLC_ORIG_CParALin;PLC_ORIG_CParALog;PLC_ORIG_CParAPer;PLC_ORIG_CLogARea;PLC_ORIG_CLin;PLC_ORIG_CPer;PLC_ORIG_SRadAre;PLC_ORIG_SRadEntPri;PLC_ORIG_SRadPoc;PLC_ORIG_SRadRes;PLC_ORIG_SRadSaiSec;PLC_ORIG_SRadAer;PLC_ORIG_SVasPri;PLC_ORIG_SPt100Poco;PLC_ORIG_SPt100EntPri;PLC_ORIG_SPt100SaiPri;PLC_ORIG_SPt100EntSec;PLC_ORIG_SPt100SaiSec;PLC_ORIG_STpPoc1;PLC_ORIG_STpPoc2;PLC_ORIG_STpLen;PLC_ORIG_SConPoc;PLC_ORIG_SConSaiPri;;PLC_CONV_STATE;PLC_CONV_TIME;PLC_CONV_TIME_Mo;PLC_CONV_TIME_D;PLC_CONV_TIME_H;PLC_CONV_TIME_Mi;PLC_CONV_TIME_S;PLC_CONV_TIME_MS;PLC_CONV_BarraReg;PLC_CONV_BarraCon;PLC_CONV_BarraSeg;PLC_CONV_CLogALog;PLC_CONV_CLogALin;PLC_CONV_CLogAPer;PLC_CONV_CParALin;PLC_CONV_CParALog;PLC_CONV_CParAPer;PLC_CONV_CLogARea;PLC_CONV_CLin;PLC_CONV_CPer;PLC_CONV_SRadAre;PLC_CONV_SRadEntPri;PLC_CONV_SRadPoc;PLC_CONV_SRadRes;PLC_CONV_SRadSaiSec;PLC_CONV_SRadAer;PLC_CONV_SVasPri;PLC_CONV_SPt100Poco;PLC_CONV_SPt100EntPri;PLC_CONV_SPt100SaiPri;PLC_CONV_SPt100EntSec;PLC_CONV_SPt100SaiSec;PLC_CONV_STpPoc1;PLC_CONV_STpPoc2;PLC_CONV_STpLen;PLC_CONV_SConPoc;PLC_CONV_SConSaiPri;\n";
+
+const char * CSV_TEMPLATE = 
+"%d;%d;%d;%d;%d;%d;%d;%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f\n";
+
 TrigaServer::TrigaServer(std::string spu_sp1,//SPU_CH_A serial port
                          std::string spu_sp2,//SPU_CH_B serial port
                          std::string clp_adress, //CLP IP
@@ -83,7 +89,7 @@ void TrigaServer::startReadThreads() // Método para Threads
     plcThread.detach();
 }
 
-void TrigaServer::createServer(int port, bool sendJson) {
+void TrigaServer::createServer(int port, bool sendCsv) {
     int serverSocket, clientSocket;
     struct sockaddr_in serverAddr, clientAddr;
     socklen_t clientLen = sizeof(clientAddr);
@@ -116,12 +122,12 @@ void TrigaServer::createServer(int port, bool sendJson) {
 
         //std::cout << "[startServer] Client connected" << std::endl;
         
-        std::thread clientThread(&TrigaServer::handleTCPClients, this, clientSocket, sendJson);
+        std::thread clientThread(&TrigaServer::handleTCPClients, this, clientSocket, sendCsv);
         clientThread.detach();
     }
 }
 
-void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
+void TrigaServer::handleTCPClients(int clientSocket, bool sendCsv)
 {
     int timeout = 2; // 2 seconds timeout
     char buffer[1024];
@@ -138,7 +144,7 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
 
     //std::cout << "[handleTCPClients] Received interval: " << interval << "ms" << std::endl;
 
-    if(sendJson)
+    if(sendCsv)
     {
         // Create new thread
         std::thread([this, interval, clientSocket]()
@@ -148,22 +154,23 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendJson)
             auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
             ALL_DATA data;
 
-            while(true)
-            {
-                data_local_spuChA = data_global_spuCh[0].load();
-                data_local_spuChB = data_global_spuCh[1].load();
-                data_local_plc = data_global_plc.load();
+            if(send(clientSocket, CSV_HEADER, sizeof(CSV_HEADER), 0) > 0)
+                while(true)
+                {
+                    data_local_spuChA = data_global_spuCh[0].load();
+                    data_local_spuChB = data_global_spuCh[1].load();
+                    data_local_plc = data_global_plc.load();
 
-                data.SPU_CHA = *data_local_spuChA;
-                data.SPU_CHB = *data_local_spuChB;
-                data.PLC    = *data_local_plc;
-                
-                std::string json = genJson(data);
+                    data.SPU_CHA = *data_local_spuChA;
+                    data.SPU_CHB = *data_local_spuChB;
+                    data.PLC    = *data_local_plc;
+                    
+                    std::string csv = genCsv(data);
 
-                if(send(clientSocket, json.c_str(), json.size(), 0) == -1) break;
+                    if(send(clientSocket, csv.c_str(), csv.size(), 0) <= 0) break;
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(interval));
-            }
+                    std::this_thread::sleep_for(std::chrono::milliseconds(interval));
+                }
         }).detach();
     }
     else
@@ -251,154 +258,6 @@ void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc)
     }
 }
 
-const char * JSON_TEMPLATE = 
-"   {\n\
-        \"SPU_CHA\": {\n\
-            \"STATE\":           %d,\n\
-            \"TIME\":{\n\
-                \"Y\":           %d,\n\
-                \"Mo\":          %d,\n\
-                \"D\":           %d,\n\
-                \"H\":           %d,\n\
-                \"Mi\":          %d,\n\
-                \"S\":           %d,\n\
-                \"MS\":          %d,\n\
-            },\n\
-            \"N_DATA_FP\":       %f,\n\
-            \"T_DATA_FP\":       %f,\n\
-            \"F1_DATA_FP\":      %f,\n\
-            \"F2_DATA_FP\":      %f,\n\
-            \"F3_DATA_FP\":      %f,\n\
-            \"EMR_N_THRESHOLD\": %f,\n\
-            \"WRN_N_THRESHOLD\": %f,\n\
-            \"EMR_T_THRESHOLD\": %f,\n\
-            \"WRN_T_THRESHOLD\": %f,\n\
-            \"EMR_N\":           %d,\n\
-            \"WRN_N\":           %d,\n\
-            \"EMR_T\":           %d,\n\
-            \"WRN_T\":           %d,\n\
-            \"R1\":              %d,\n\
-            \"R2\":              %d,\n\
-            \"R3\":              %d,\n\
-            \"RDY\":             %d,\n\
-            \"TEST\":            %d,\n\
-            \"XXXX\":            %d\n\
-        },\n\
-        \"SPU_CHB\": {\n\
-            \"STATE\":           %d,\n\
-            \"TIME\":{\n\
-                \"Y\":           %d,\n\
-                \"Mo\":          %d,\n\
-                \"D\":           %d,\n\
-                \"H\":           %d,\n\
-                \"Mi\":          %d,\n\
-                \"S\":           %d,\n\
-                \"MS\":          %d,\n\
-            },\n\
-            \"N_DATA_FP\":       %f,\n\
-            \"T_DATA_FP\":       %f,\n\
-            \"F1_DATA_FP\":      %f,\n\
-            \"F2_DATA_FP\":      %f,\n\
-            \"F3_DATA_FP\":      %f,\n\
-            \"EMR_N_THRESHOLD\": %f,\n\
-            \"WRN_N_THRESHOLD\": %f,\n\
-            \"EMR_T_THRESHOLD\": %f,\n\
-            \"WRN_T_THRESHOLD\": %f,\n\
-            \"EMR_N\":           %d,\n\
-            \"WRN_N\":           %d,\n\
-            \"EMR_T\":           %d,\n\
-            \"WRN_T\":           %d,\n\
-            \"R1\":              %d,\n\
-            \"R2\":              %d,\n\
-            \"R3\":              %d,\n\
-            \"RDY\":             %d,\n\
-            \"TEST\":            %d,\n\
-            \"XXXX\":            %d\n\
-        },\n\
-        \"PLC_ORIG\": {\n\
-            \"STATE\":           %d,\n\
-            \"TIME\":{\n\
-                \"Y\":           %d,\n\
-                \"Mo\":          %d,\n\
-                \"D\":           %d,\n\
-                \"H\":           %d,\n\
-                \"Mi\":          %d,\n\
-                \"S\":           %d,\n\
-                \"MS\":          %d,\n\
-            },\n\
-            \"BarraReg\":        %d,\n\
-            \"BarraCon\":        %d,\n\
-            \"BarraSeg\":        %d,\n\
-            \"CLogALog\":        %d,\n\
-            \"CLogALin\":        %d,\n\
-            \"CLogAPer\":        %d,\n\
-            \"CParALin\":        %d,\n\
-            \"CParALog\":        %d,\n\
-            \"CParAPer\":        %d,\n\
-            \"CLogARea\":        %d,\n\
-            \"CLin\":            %d,\n\
-            \"CPer\":            %d,\n\
-            \"SRadAre\":         %d,\n\
-            \"SRadEntPri\":      %d,\n\
-            \"SRadPoc\":         %d,\n\
-            \"SRadRes\":         %d,\n\
-            \"SRadSaiSec\":      %d,\n\
-            \"SRadAer\":         %d,\n\
-            \"SVasPri\":         %d,\n\
-            \"SPt100Poco\":      %d,\n\
-            \"SPt100EntPri\":    %d,\n\
-            \"SPt100SaiPri\":    %d,\n\
-            \"SPt100EntSec\":    %d,\n\
-            \"SPt100SaiSec\":    %d,\n\
-            \"STpPoc1\":         %d,\n\
-            \"STpPoc2\":         %d,\n\
-            \"STpLen\":          %d,\n\
-            \"SConPoc\":         %d,\n\
-            \"SConSaiPri\":      %d,\n\
-        },\n\
-        \"PLC_CONV\": {\n\
-            \"STATE\":           %d,\n\
-            \"TIME\":{\n\
-                \"Y\":           %d,\n\
-                \"Mo\":          %d,\n\
-                \"D\":           %d,\n\
-                \"H\":           %d,\n\
-                \"Mi\":          %d,\n\
-                \"S\":           %d,\n\
-                \"MS\":          %d,\n\
-            },\n\
-            \"BarraReg\":        %f,\n\
-            \"BarraCon\":        %f,\n\
-            \"BarraSeg\":        %f,\n\
-            \"CLogALog\":        %f,\n\
-            \"CLogALin\":        %f,\n\
-            \"CLogAPer\":        %f,\n\
-            \"CParALin\":        %f,\n\
-            \"CParALog\":        %f,\n\
-            \"CParAPer\":        %f,\n\
-            \"CLogARea\":        %f,\n\
-            \"CLin\":            %f,\n\
-            \"CPer\":            %f,\n\
-            \"SRadAre\":         %f,\n\
-            \"SRadEntPri\":      %f,\n\
-            \"SRadPoc\":         %f,\n\
-            \"SRadRes\":         %f,\n\
-            \"SRadSaiSec\":      %f,\n\
-            \"SRadAer\":         %f,\n\
-            \"SVasPri\":         %f,\n\
-            \"SPt100Poco\":      %f,\n\
-            \"SPt100EntPri\":    %f,\n\
-            \"SPt100SaiPri\":    %f,\n\
-            \"SPt100EntSec\":    %f,\n\
-            \"SPt100SaiSec\":    %f,\n\
-            \"STpPoc1\":         %f,\n\
-            \"STpPoc2\":         %f,\n\
-            \"STpLen\":          %f,\n\
-            \"SConPoc\":         %f,\n\
-            \"SConSaiPri\":      %f,\n\
-        },\n\
-    }\n";
-
 int_TIME TrigaServer::decodeTime(std::chrono::system_clock::time_point t)
 {
     auto now = std::chrono::system_clock::to_time_t(t);
@@ -417,15 +276,16 @@ int_TIME TrigaServer::decodeTime(std::chrono::system_clock::time_point t)
     return time;
 }
 
-std::string TrigaServer::genJson(ALL_DATA all_data) 
+std::string TrigaServer::genCsv(ALL_DATA all_data) 
 {
     int_TIME SPU_CHA_TIME = decodeTime(all_data.SPU_CHA.TIME);
     int_TIME SPU_CHB_TIME = decodeTime(all_data.SPU_CHB.TIME);
     int_TIME PLC_TIME     = decodeTime(all_data.PLC.TIME);
-    PLC_DATA plc_conv     = plc.convAllData(all_data.PLC, plc.fatorConv);;
+    PLC_DATA plc_conv     = plc.convAllData(all_data.PLC, plc.fatorConv);
 
-    sprintf(buffer, JSON_TEMPLATE, all_data.SPU_CHA.STATE,
     char buffer[8192];
+
+    sprintf(buffer, CSV_TEMPLATE, all_data.SPU_CHA.STATE,
             SPU_CHA_TIME.year,
             SPU_CHA_TIME.month,
             SPU_CHA_TIME.day,

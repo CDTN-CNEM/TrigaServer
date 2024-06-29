@@ -93,7 +93,7 @@ class TrigaServer
         std::atomic<std::shared_ptr<PLC_DATA>> data_global_plc      =  std::make_shared<PLC_DATA>();
 
         // Função para gerar string JSON com todos os dados
-        std::string genJson(ALL_DATA all_data);
+        std::string genCsv(ALL_DATA all_data);
 
         //Função para converter time_point em struct int_TIME (usando pelo genJson)
         int_TIME decodeTime(std::chrono::system_clock::time_point t);
