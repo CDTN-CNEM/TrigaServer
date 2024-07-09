@@ -6,7 +6,7 @@ project(
   TrigaServer
   VERSION 0.0.1
   DESCRIPTION "Get the real-time values of the Nuclear Reator Triga IPR-R1 and share in network."
-  HOMEPAGE_URL "https://github.com/SEURT-CDTN/TrigaServer"
+  HOMEPAGE_URL "https://github.com/TRIGA-IPR-R1/TrigaServer"
   LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -26,7 +26,7 @@ if(NOT LibModbusSystematomSPU_FOUND)
   message(STATUS "LibModbusSystematomSPU not found, Downloading it.")
   FetchContent_Declare(
     LibModbusSystematomSPU
-    GIT_REPOSITORY https://github.com/SEURT-CDTN/libModbusSystematomSPU
+    GIT_REPOSITORY https://github.com/TRIGA-IPR-R1/libModbusSystematomSPU
     GIT_TAG main
     EXCLUDE_FROM_ALL)
   FetchContent_MakeAvailable(LibModbusSystematomSPU)
@@ -39,7 +39,7 @@ if(NOT LibOpcTrigaPLC_FOUND)
   message(STATUS "LibOpcTrigaPLC not found, Downloading it.")
   FetchContent_Declare(
     LibOpcTrigaPLC
-    GIT_REPOSITORY https://github.com/SEURT-CDTN/libOpcTrigaPLC
+    GIT_REPOSITORY https://github.com/TRIGA-IPR-R1/libOpcTrigaPLC
     GIT_TAG main
     EXCLUDE_FROM_ALL)
   FetchContent_MakeAvailable(LibOpcTrigaPLC)
