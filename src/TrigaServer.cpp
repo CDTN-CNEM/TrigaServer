@@ -138,7 +138,13 @@ void TrigaServer::handleTCPClients(int clientSocket, bool sendCsv)
         close(clientSocket);
         return;
     }
-
+    //Caso algum digito não numero for recebido, encerre a execução
+    for (int i = 0; i < n-1; ++i) if (!isdigit(buffer[i])) 
+    {
+        std::cerr << "[handleTCPClients] Error: client sent a not number" << std::endl;
+        close(clientSocket);
+        return;
+    }
     // Parse received data (assuming it's a number)
     int interval = std::stoi(std::string(buffer, n));
 
