@@ -65,7 +65,7 @@ class TrigaServer
         ~TrigaServer();
 
         //Função que cria servidor TCP
-        void createServer(int port, bool sendJson);
+        void createServer(int port, int kind);
 
         //Função para leitura de estados das readThreads
         std::vector<int> state();
@@ -93,13 +93,13 @@ class TrigaServer
         std::atomic<std::shared_ptr<PLC_DATA>> data_global_plc      =  std::make_shared<PLC_DATA>();
 
         // Função para gerar string JSON com todos os dados
-        std::string genCsv(ALL_DATA all_data);
+        std::string genString(ALL_DATA all_data, int kind);
 
         //Função para converter time_point em struct int_TIME (usando pelo genJson)
         int_TIME decodeTime(std::chrono::system_clock::time_point t);
 
         //Função que lida com os clientes (recebe o valor de intervalo e cria uma thread para cada cliente)
-        void handleTCPClients(int clientSocket, bool sendJson);
+        void handleTCPClients(int clientSocket, int kind);
 
         //Threads de leitura de hardware
         void startReadThreads();

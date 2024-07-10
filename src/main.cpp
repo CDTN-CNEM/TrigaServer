@@ -125,12 +125,22 @@ int main(int argc, char* argv[])
                        config.plc_conv_file,
                        config.error_interval_spu,
                        config.error_interval_plc);
-    std::thread serverThread    (&TrigaServer::createServer, &server, config.port_raw, false);
-    std::thread serverJsonThread(&TrigaServer::createServer, &server, config.port_json,true);
 
-    serverThread.detach();
-    serverJsonThread.detach();
-
+    if(config.port_raw)  
+    {
+        std::thread serverThread    (&TrigaServer::createServer, &server, config.port_raw,  0);
+        serverThread.detach();
+    }
+    if(config.port_csv)  
+    {
+        std::thread serverCsvThread (&TrigaServer::createServer, &server, config.port_csv,  1);
+        serverCsvThread.detach();
+    }
+    if(config.port_json)
+    {
+        std::thread serverJsonThread(&TrigaServer::createServer, &server, config.port_json, 2);
+        serverJsonThread.detach();
+    }
     //Espere 3 segundo antes de abrir o monitor
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
@@ -143,8 +153,9 @@ int main(int argc, char* argv[])
         
         std::string screen = "TrigaServer - System Monitor\n";
                     screen += "\nClients Side\n";
-                    screen += "Server  RAW:   PORT=" + std::to_string(config.port_raw)                                + "\n";
-                    screen += "Server JSON:   PORT=" + std::to_string(config.port_json)                               + "\n";
+                    if(config.port_raw)  screen += "Server  RAW:   PORT=" + std::to_string(config.port_raw)           + "\n";
+                    if(config.port_csv)  screen += "Server  CSV:   PORT=" + std::to_string(config.port_csv)           + "\n";
+                    if(config.port_json) screen += "Server  JSON:  PORT=" + std::to_string(config.port_json)          + "\n";
                     //screen += "Num. Clients:?\n";
                     screen += "\nMachine Side\n";
                     screen += "SPU_A:    STATE="     + std::to_string(state[0]) + "\t\tPORT=" + config.spu_sp1        + "\n";
