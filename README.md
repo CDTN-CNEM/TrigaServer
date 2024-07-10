@@ -25,7 +25,7 @@ paru -S libmodbus #AUR
 Afterwards, you can clone, build and compile with the following commands:
 
 ``` Bash
-git clone https://github.com/SEURT-CDTN/TrigaServer.git
+git clone https://github.com/TRIGA-IPR-R1/TrigaServer.git
 cd TrigaServer
 mkdir build
 cd build
@@ -41,7 +41,7 @@ If you are using a Arch-based distribution, run:
 paru -S libmodbus #AUR
 mkdir -p ~/TrigaServer-PKG
 cd ~/TrigaServer-PKG
-wget https://raw.githubusercontent.com/SEURT-CDTN/InstallGNU/ArchLinux/TrigaServer/PKGBUILD
+wget https://raw.githubusercontent.com/TRIGA-IPR-R1/InstallGNU/ArchLinux/TrigaServer/PKGBUILD
 makepkg -s #Or use -si to install when finish the build.
 ```
 
