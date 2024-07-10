@@ -40,112 +40,84 @@ void showLicense()
 
 struct CONFIG
 {
-    std::string spu_sp1   = "/dev/modbus/spuChA";//SPU_CH_A serial port
-    std::string spu_sp2   = "/dev/modbus/spuChB";//SPU_CH_B serial port
-    std::string plc_adress = "192.168.1.1:4840"; //PLC IP:PORT
-    std::string plc_conv_file = "/etc/libOpcTrigaPLC.conf"; //Path to PLCconversion file
-    short       port_raw  = 1234; //Port of server RAW
-    short       port_json = 12345; //Port of server JSON
-    int         error_interval_spu = 2;//
-    int         error_interval_plc = 2;//
-    int         monitor_stdout   = 0;//
-    int         monitor_interval = 3;//
+    std::string spu_sp1             = "/dev/modbus/spuChA";       //SPU_CH_A serial port
+    std::string spu_sp2             = "/dev/modbus/spuChB";       //SPU_CH_B serial port
+    std::string plc_adress          = "192.168.1.1:4840";         //CLP IP:PORT
+    std::string plc_conv_file       = "/etc/libOpcTrigaPLC.conf"; //CLP conv file
+    short       port_raw            = 123;                        //Port of server RAW
+    short       port_csv            = 1234;                       //Port of server CSV
+    short       port_json           = 12345;                      //Port of server JSON
+    int         error_interval_spu  = 2;                          //
+    int         error_interval_plc  = 2;                          //
+    int         monitor_interval    = 3;                          //
+    bool        monitor_stdout      = 0;                          //
+    bool        close               = 0;
 };
 
-CONFIG readConfigFile(std::string filename)
+CONFIG configOptions(int argc, char* argv[])
 {
     CONFIG config;
-    
-    std::ifstream configFile(filename);
-    
-    if (!configFile.is_open()) 
+    cxxopts::Options options("TrigaServer","TrigaServer is a software for GNU operating system to get the real-time values of the Nuclear Reator Triga IPR-R1 and share in network.");
+
+    options.add_options()
+        ("v,version",          "Show the program version")
+        ("h,help",             "Show this help message")
+        ("l,license",          "Show info of the license")
+        ("m,monitor",          "Set system monitor to STD_OUT")
+        ("SPU_CHA",            "Set spuChA device file",                                        cxxopts::value<std::string>())
+        ("SPU_CHB",            "Set spuChB device file",                                        cxxopts::value<std::string>())
+        ("PLC_ADRESS",         "Set PLC adress in format IP:PORT",                              cxxopts::value<std::string>())
+        ("PLC_CONV_FILE",      "Set convertion file for PLC values",                            cxxopts::value<std::string>())
+        ("PORT_RAW",           "Set port for the server in RAW format (set 0 to desactivate)",  cxxopts::value<int>())
+        ("PORT_CSV",           "Set port for the server in CSV format",                         cxxopts::value<int>())
+        ("PORT_JSON",          "Set port for the server in JSON format",                        cxxopts::value<int>())
+        ("INTERVAL_ERROR_SPU", "Set reconnect interval of SPU in case of error",                cxxopts::value<int>())
+        ("INTERVAL_ERROR_PLC", "Set reconnect interval of PLC in case of error",                cxxopts::value<int>())
+        ("INTERVAL_MONITOR",   "Set interval of system monitor",                                cxxopts::value<int>());
+
+    auto result = options.parse(argc, argv);
+
+    if (result.count("version") || result.count("v"))
     {
-        std::cerr << "[readConfigFile] Erro ao abrir o arquivo de configuração: " << filename << std::endl;
-        filename = "trigaserver.conf";
-        std::ifstream configFile(filename);
-        std::cerr << "[readConfigFile] Tentando abrir: " << filename << std::endl;
-        if (!configFile.is_open()) 
-        {
-            std::cerr << "[readConfigFile] Erro ao abrir o arquivo de configuração: " << filename << std::endl;
-            std::cerr << "[readConfigFile] Configurações setadas como padrão" << std::endl;
-            return config;
-        }
+        showVersion();
+        config.close = true;
+        return config;
+    } 
+    if (result.count("help") || result.count("h"))
+    {
+        std::cout << options.help() << std::endl;
+        config.close = true;
+        return config;
+    } 
+    if (result.count("license") || result.count("l"))
+    {
+        showLicense();
+        config.close = true;
+        return config;
     }
 
-    std::string line;
-    while (std::getline(configFile, line)) {
-        size_t pos = line.find('=');
-        if (pos != std::string::npos) {
-            std::string key = line.substr(0, pos);
-            std::string value = line.substr(pos + 1);
+    if (result.count("monitor") || result.count("m"))  config.monitor_stdout = true;//Impor monitor na STD_OUT
+    
+    if (result.count("SPU_CHA"))             config.spu_sp1            = result["SPU_CHA"].as<std::string>();
+    if (result.count("SPU_CHB"))             config.spu_sp2            = result["SPU_CHB"].as<std::string>();
+    if (result.count("PLC_ADRESS"))          config.plc_adress         = result["PLC_ADRESS"].as<std::string>();
+    if (result.count("PLC_CONV_FILE"))       config.plc_conv_file      = result["PLC_CONV_FILE"].as<std::string>();
+    if (result.count("PORT_RAW"))            config.port_raw           = result["PORT_RAW"].as<int>();
+    if (result.count("PORT_CSV"))            config.port_csv           = result["PORT_CSV"].as<int>();
+    if (result.count("PORT_JSON"))           config.port_json          = result["PORT_JSON"].as<int>();
+    if (result.count("INTERVAL_ERROR_SPU"))  config.error_interval_spu = result["INTERVAL_ERROR_SPU"].as<int>();
+    if (result.count("INTERVAL_ERROR_PLC"))  config.error_interval_plc = result["INTERVAL_ERROR_PLC"].as<int>();
+    if (result.count("INTERVAL_MONITOR"))    config.monitor_interval   = result["INTERVAL_MONITOR"].as<int>();
 
-            // Remova espaços em branco extras
-            key.erase(0, key.find_first_not_of(" \t"));
-            key.erase(key.find_last_not_of(" \t") + 1);
-            value.erase(0, value.find_first_not_of(" \t"));
-            value.erase(value.find_last_not_of(" \t") + 1);
-
-            if      (key == "spu_sp1")            config.spu_sp1 = value.c_str();
-            else if (key == "spu_sp2")            config.spu_sp2 = value.c_str();
-            else if (key == "clp_adress")         config.plc_adress = value.c_str();
-            else if (key == "plc_conv_file")      config.plc_conv_file = value.c_str();
-            else if (key == "port_json")          config.port_json = std::stoi(value);
-            else if (key == "port_raw")           config.port_raw = std::stoi(value);
-            else if (key == "error_interval_spu") config.error_interval_spu = std::stoi(value);
-            else if (key == "error_interval_plc") config.error_interval_plc = std::stoi(value);
-            else if (key == "interval_monitor")   config.monitor_interval = std::stoi(value);            
-        }
-    }
-
-    configFile.close();
     return config;
-
 }
 
 int main(int argc, char* argv[])
 {
     signal(SIGPIPE, SIG_IGN);
-    std::string filename = "/etc/trigaserver.conf";
-    cxxopts::Options options("TrigaServer","TrigaServer is a software for GNU operating system to get the real-time values of the Nuclear Reator Triga IPR-R1 and share in network.");
-    bool monitor_stdout_arg = 0;
-
-    options.add_options()
-        ("v,version", "Show the program version")
-        ("h,help", "Show this help message")
-        ("l,license", "Show info of the license")
-        ("c,config", "Change the configuration file")
-        ("m,monitor", "Make the system monitor in STD_OUT");
-
-    auto result = options.parse(argc, argv);
-
-    if (argc >1)
-    {
-        if (result.count("version") || result.count("v")){
-            showVersion();
-            return 0;
-        } else if (result.count("help") || result.count("h")){
-            std::cout << options.help() << std::endl;
-            return 0;
-        } else if (result.count("license") || result.count("l")) {
-            showLicense();
-            return 0;
-        } else if (result.count("config") || result.count("c")){
-            if (result["config"].as<std::string>().empty()) {
-                std::cerr << "Error: Please provide a filename for --config option." << std::endl;
-                return 1;
-            }
-            filename = result["config"].as<std::string>();
-        } else if (result.count("monitor") || result.count("m")){//Impor monitor na STD_OUT
-            monitor_stdout_arg = true;
-        } else {
-            std::cout << options.help() << std::endl;
-            return 1;
-        }
-    }
-
-
-    CONFIG config = readConfigFile(filename);
-    if (monitor_stdout_arg) config.monitor_stdout = true;
+    
+    CONFIG config = configOptions(argc, argv);
+    if (config.close) return 0;
 
     TrigaServer server(config.spu_sp1,
                        config.spu_sp2,
