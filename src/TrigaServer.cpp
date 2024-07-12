@@ -182,8 +182,8 @@ void TrigaServer::handleTCPClients(int clientSocket, int kind)
             data.PLC     = *data_local_plc;
             
             std::string      buffer = genString(data, kind);
-            std::cout << buffer <<"\n\n\n\n\n";
-            std::cout << buffer.length() <<"\n\n\n\n\n";
+            //std::cout << buffer <<"\n\n\n\n\n";
+            //std::cout << buffer.length() <<"\n\n\n\n\n";
             if(send(clientSocket, buffer.c_str(), buffer.length(), 0) <= 0) break;
 
             std::this_thread::sleep_for(std::chrono::milliseconds(interval));
