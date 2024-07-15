@@ -199,8 +199,8 @@ void TrigaServer::readModbusRTU(libModbusSystematomSPU& spu)
 
     //Definindo qual SPU essa thread representa
     int adressSpu;
-    if      (spu.get_portname() == adressSpuB) adressSpu = 0;
-    else if (spu.get_portname() == adressSpuA) adressSpu = 1;
+    if      (spu.get_portname() == adressSpuA) adressSpu = 0;
+    else if (spu.get_portname() == adressSpuB) adressSpu = 1;
     else
     {
         std::cerr << "ERRO TrigaServer::readModbusRTU: erro em get_portname()";
