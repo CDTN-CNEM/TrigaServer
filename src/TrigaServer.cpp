@@ -231,7 +231,7 @@ void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc)
     auto data_local = std::shared_ptr <PLC_DATA> (new PLC_DATA);
     while (true)
     {
-        *data_local = plc.get_all_conv();
+        *data_local = plc.get_all();
         data_global_plc.store(data_local);
         if(data_local->STATE) //Caso STATE for diferente de 0
         {
