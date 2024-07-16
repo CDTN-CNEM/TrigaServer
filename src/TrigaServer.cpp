@@ -213,8 +213,8 @@ void TrigaServer::readModbusRTU(libModbusSystematomSPU& spu)
         *data_local  = spu.get_all();
         //Passar para o ponteiro inteligente global spuChA
         data_global_spuCh[adressSpu].store(data_local);
-        //Se o valor de STATE for igual a 2 (desconectado) pause a thread por 1 segundo e tente reconectar
-        if(data_local->STATE==2) 
+        //Se o valor de STATE for igual a 1 (erro de leitura) ou 2 (desconectado) pause a thread pelo determinado intervalo e tente reconectar
+        if(data_local->STATE) 
         {
             std::this_thread::sleep_for(std::chrono::seconds(errorIntervalSPU));
             spu.tryConnect();
@@ -236,7 +236,7 @@ void TrigaServer::readOpcTCP(libOpcTrigaPLC& plc)
         if(data_local->STATE) //Caso STATE for diferente de 0
         {
             std::this_thread::sleep_for(std::chrono::seconds(errorIntervalPLC));
-            if(data_local->STATE==2) //Caso o erro seja "desconexão"
+            if(data_local->STATE==2) //Só tente reconectar o PLC caso o erro seja "desconexão"
                 plc.tryConnect();
         }
     }
