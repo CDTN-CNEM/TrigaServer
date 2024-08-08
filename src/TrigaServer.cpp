@@ -279,7 +279,7 @@ std::string TrigaServer::genString(ALL_DATA all_data, int kind)
         int_TIME SPU_CHA_TIME = decodeTime(all_data.SPU_CHA.TIME);
         int_TIME SPU_CHB_TIME = decodeTime(all_data.SPU_CHB.TIME);
         int_TIME PLC_TIME     = decodeTime(all_data.PLC.TIME);
-        PLC_DATA plc_conv     = plc.convAllData(all_data.PLC, plc.fatorConv);
+        PLC_DATA plc_conv     = plc.convAllData(all_data.PLC);
 
         char buffer[8192];
 
