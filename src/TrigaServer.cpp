@@ -188,10 +188,10 @@ void TrigaServer::handleTCPClients(int clientSocket, int kind)
             data.PLC     = *data_local_plc;
             
             std::string      buffer = genString(data, kind);
-            //std::cout << buffer <<"\n\n\n\n\n";
-            //std::cout << buffer.length() <<"\n\n\n\n\n";
-            if(send(clientSocket, buffer.c_str(), buffer.length(), 0) <= 0) break;
-
+            
+            //Se for enviar no formato RAW, envie o conteudo de buffer na quantidade de sizeof(ALL_DATA)
+            //Se for enviar no formato CSV ou JSON, envie o conteudo de buffer na quantidade identificada por length()
+            if(send(clientSocket, buffer.c_str(), (kind == 0) ? sizeof(ALL_DATA) : buffer.length(), 0) <= 0) break;
             std::this_thread::sleep_for(std::chrono::milliseconds(interval));
         }
     }).detach();
