@@ -167,7 +167,13 @@ void TrigaServer::handleTCPClients(int clientSocket, int kind)
         auto data_local_plc    = std::shared_ptr <PLC_DATA> (new PLC_DATA);
         ALL_DATA data;
 
-        if(kind == 1)
+        if(kind== 0)//Se for enviar no formato RAW, envie primeiro a quantidade de sizeof(ALL_DATA) uma única vez
+        {
+            std::string dataSize = std::to_string(sizeof(ALL_DATA))+"\n";
+            if(send(clientSocket, dataSize.c_str(), dataSize.length(), 0) <= 0) 
+                return;
+        }        
+        else if(kind == 1) //Se for CSV, envie o cabeçalho uma única vez, primeiramente
             if(send(clientSocket, CSV_HEADER, sizeof(CSV_HEADER), 0) <= 0)
                 return;
 
