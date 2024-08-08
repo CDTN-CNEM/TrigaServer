@@ -43,7 +43,7 @@ struct CONFIG
     std::string spu_sp1             = "/dev/modbus/spuChA";       //SPU_CH_A serial port
     std::string spu_sp2             = "/dev/modbus/spuChB";       //SPU_CH_B serial port
     std::string plc_adress          = "192.168.1.1:4840";         //CLP IP:PORT
-    std::string plc_conv_file       = "/etc/libOpcTrigaPLC.conf"; //CLP conv file
+    std::string plc_conv_file       = "";                         //CLP conv file
     short       port_raw            = 123;                        //Port of server RAW
     short       port_csv            = 1234;                       //Port of server CSV
     short       port_json           = 12345;                      //Port of server JSON
